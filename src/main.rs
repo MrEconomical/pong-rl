@@ -1,3 +1,4 @@
 fn main() {
-    println!("Hello, world!");
+    println!("running main");
+    pong_rl::test();
 }

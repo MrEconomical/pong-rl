@@ -1,4 +1,4 @@
-use crate::config::{HEIGHT, WIDTH};
+use crate::config::{HEIGHT, WIDTH, WINDOW_SCALE};
 use std::mem;
 use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{mpsc, Arc, Mutex};
@@ -52,7 +52,10 @@ fn build_window(event_sender: Sender<UserEvent>, pixels_sender: Sender<Arc<Mutex
 
     let event_loop = EventLoopBuilder::new().with_any_thread(true).build(); // Only works on Windows
     let window = {
-        let default_size = LogicalSize::new((WIDTH * 2) as f64, (HEIGHT * 2) as f64);
+        let default_size = LogicalSize::new(
+            (WIDTH * WINDOW_SCALE) as f64,
+            (HEIGHT * WINDOW_SCALE) as f64,
+        );
         let min_size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
             .with_title("Pong")
@@ -68,7 +71,7 @@ fn build_window(event_sender: Sender<UserEvent>, pixels_sender: Sender<Arc<Mutex
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
         let pixels = Arc::new(Mutex::new(
-            Pixels::new(WIDTH, HEIGHT, surface_texture).unwrap(),
+            Pixels::new(WIDTH as u32, HEIGHT as u32, surface_texture).unwrap(),
         ));
 
         // Send Pixels to main thread

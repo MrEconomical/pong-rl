@@ -1,4 +1,6 @@
+use pong_rl::PongGame;
+
 fn main() {
-    let (_, event_channel, handle) = pong_rl::create_window();
-    let _ = handle.join();
+    let pong = PongGame::new();
+    pong.window_handle.join();
 }

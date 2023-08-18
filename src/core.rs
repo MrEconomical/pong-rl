@@ -1,6 +1,6 @@
 mod frame;
 
-use frame::Frame;
+use frame::{Frame, Point, PosChange};
 use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;

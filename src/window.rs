@@ -26,6 +26,7 @@ pub enum UserEvent {
 pub enum PaddleDir {
     Up,
     Down,
+    Stop,
 }
 
 // Spawn window thread and return Pixels, window events channel, and events thread handle
@@ -121,17 +122,40 @@ fn handle_events(
             } => {
                 // Send paddle direction input to channel
 
-                match key {
-                    VirtualKeyCode::W | VirtualKeyCode::Up => {
-                        println!("paddle up");
+                if action_type == ElementState::Released {
+                    event_sender
+                        .send(UserEvent::PaddleInput(PaddleDir::Stop))
+                        .unwrap();
+                } else {
+                    match key {
+                        VirtualKeyCode::W | VirtualKeyCode::Up => {
+                            event_sender
+                                .send(UserEvent::PaddleInput(PaddleDir::Up))
+                                .unwrap();
+                        }
+                        VirtualKeyCode::S | VirtualKeyCode::Down => {
+                            event_sender
+                                .send(UserEvent::PaddleInput(PaddleDir::Down))
+                                .unwrap();
+                        }
+                        _ => (),
                     }
-                    VirtualKeyCode::S | VirtualKeyCode::Down => {
-                        println!("paddle down");
-                    }
-                    _ => (),
                 }
             }
-            WindowEvent::Resized(size) => {}
+            WindowEvent::Resized(size) => {
+                // Resize Pixels surface on window resize
+
+                if let Err(error) = pixels
+                    .lock()
+                    .unwrap()
+                    .resize_surface(size.width, size.height)
+                {
+                    eprintln!("Error in resize: {error}");
+                    let _ = event_sender.send(UserEvent::Exit);
+                    *control_flow = ControlFlow::Exit;
+                    return;
+                }
+            }
             WindowEvent::CloseRequested | WindowEvent::Destroyed => {
                 // Exit event loop on window close
 

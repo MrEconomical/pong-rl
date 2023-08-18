@@ -5,9 +5,21 @@ use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
 
+// Ball velocity struct
+
+#[derive(Clone, Copy)]
+struct Velocity {
+    pub x: f64,
+    pub y: f64,
+}
+
 // Core Pong game struct
 
 pub struct Pong {
+    ball: Point,
+    ball_velocity: Velocity,
+    left_paddle: Point,
+    right_paddle: Point,
     frame: Frame,
 }
 
@@ -16,7 +28,41 @@ impl Pong {
 
     pub fn new(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Pong {
+            ball: Pong::initial_ball_pos(),
+            ball_velocity: Pong::random_ball_velocity(),
+            left_paddle: Pong::initial_left_paddle_pos(),
+            right_paddle: Pong::initial_right_paddle_pos(),
             frame: Frame::new(pixels),
         }
+    }
+
+    // Reset game and frame buffers
+
+    pub fn reset(&mut self) {
+        self.frame.reset(false);
+        self.ball = Pong::initial_ball_pos();
+        self.ball_velocity = Pong::random_ball_velocity();
+        self.left_paddle = Pong::initial_left_paddle_pos();
+        self.right_paddle = Pong::initial_right_paddle_pos();
+        self.frame
+            .force_draw(self.ball, self.left_paddle, self.right_paddle);
+    }
+
+    // Calculate initial game values
+
+    fn initial_ball_pos() -> Point {
+        Point(0, 0)
+    }
+
+    fn random_ball_velocity() -> Velocity {
+        Velocity { x: 0.0, y: 0.0 }
+    }
+
+    fn initial_left_paddle_pos() -> Point {
+        Point(0, 0)
+    }
+
+    fn initial_right_paddle_pos() -> Point {
+        Point(0, 0)
     }
 }

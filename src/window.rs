@@ -105,6 +105,8 @@ fn handle_events(
         }
     }
 
+    // Check user input events
+
     if let Event::WindowEvent {
         event: window_event,
         ..
@@ -126,17 +128,20 @@ fn handle_events(
                     event_sender
                         .send(UserEvent::PaddleInput(PaddleDir::Stop))
                         .unwrap();
+                    return;
                 } else {
                     match key {
                         VirtualKeyCode::W | VirtualKeyCode::Up => {
                             event_sender
                                 .send(UserEvent::PaddleInput(PaddleDir::Up))
                                 .unwrap();
+                            return;
                         }
                         VirtualKeyCode::S | VirtualKeyCode::Down => {
                             event_sender
                                 .send(UserEvent::PaddleInput(PaddleDir::Down))
                                 .unwrap();
+                            return;
                         }
                         _ => (),
                     }
@@ -161,6 +166,7 @@ fn handle_events(
 
                 event_sender.send(UserEvent::Exit).unwrap();
                 *control_flow = ControlFlow::Exit;
+                return;
             }
             _ => (),
         }

@@ -1,14 +1,15 @@
 mod config;
+mod core;
+mod env;
+mod game;
 
+pub use game::PongGame;
+
+use env::PongEnv;
 use pyo3::prelude::*;
-
-#[pyfunction]
-pub fn test() {
-    println!("test function");
-}
 
 #[pymodule]
 fn pong_rl(_: Python<'_>, module: &PyModule) -> PyResult<()> {
-    module.add_function(wrap_pyfunction!(test, module)?)?;
+    module.add_class::<PongEnv>()?;
     Ok(())
 }

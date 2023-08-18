@@ -7,7 +7,7 @@ use std::thread::JoinHandle;
 
 use pixels::{Pixels, SurfaceTexture};
 use winit::dpi::LogicalSize;
-use winit::event::Event;
+use winit::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 use winit::event_loop::{ControlFlow, EventLoopBuilder};
 use winit::platform::windows::EventLoopBuilderExtWindows;
 use winit::window::WindowBuilder;
@@ -39,7 +39,7 @@ pub fn create_window() -> (Arc<Mutex<Pixels>>, Receiver<UserEvent>, JoinHandle<(
     // Create thread and move sender channels into event handler task
 
     let handle = thread::spawn(move || build_window(event_sender, pixels_sender));
-    let pixels = pixels_receiver.recv().expect("failed to receive Pixels");
+    let pixels = pixels_receiver.recv().unwrap();
 
     (pixels, event_receiver, handle)
 }
@@ -72,9 +72,7 @@ fn build_window(event_sender: Sender<UserEvent>, pixels_sender: Sender<Arc<Mutex
 
         // Send Pixels to main thread
 
-        pixels_sender
-            .send(pixels.clone())
-            .expect("failed to send Pixels");
+        pixels_sender.send(pixels.clone()).unwrap();
         mem::drop(pixels_sender);
 
         pixels
@@ -100,8 +98,47 @@ fn handle_events(
     if let Event::RedrawRequested(_) = event {
         if let Err(error) = pixels.lock().unwrap().render() {
             eprintln!("Error in render: {error}");
+            let _ = event_sender.send(UserEvent::Exit);
             *control_flow = ControlFlow::Exit;
             return;
+        }
+    }
+
+    if let Event::WindowEvent {
+        event: window_event,
+        ..
+    } = event
+    {
+        match window_event {
+            WindowEvent::KeyboardInput {
+                input:
+                    KeyboardInput {
+                        state: action_type,
+                        virtual_keycode: Some(key),
+                        ..
+                    },
+                ..
+            } => {
+                // Send paddle direction input to channel
+
+                match key {
+                    VirtualKeyCode::W | VirtualKeyCode::Up => {
+                        println!("paddle up");
+                    }
+                    VirtualKeyCode::S | VirtualKeyCode::Down => {
+                        println!("paddle down");
+                    }
+                    _ => (),
+                }
+            }
+            WindowEvent::Resized(size) => {}
+            WindowEvent::CloseRequested | WindowEvent::Destroyed => {
+                // Exit event loop on window close
+
+                event_sender.send(UserEvent::Exit).unwrap();
+                *control_flow = ControlFlow::Exit;
+            }
+            _ => (),
         }
     }
 }

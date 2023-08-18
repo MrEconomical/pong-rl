@@ -15,7 +15,7 @@ use winit::window::WindowBuilder;
 // Window event enum
 
 #[derive(Clone, Copy, PartialEq)]
-pub enum WindowEvent {
+pub enum UserEvent {
     PaddleInput(PaddleDir),
     Exit,
 }
@@ -30,7 +30,7 @@ pub enum PaddleDir {
 
 // Spawn window thread and return Pixels, window events channel, and events thread handle
 
-pub fn create_window() -> (Arc<Mutex<Pixels>>, Receiver<WindowEvent>, JoinHandle<()>) {
+pub fn create_window() -> (Arc<Mutex<Pixels>>, Receiver<UserEvent>, JoinHandle<()>) {
     // Create channels for receiving events and Pixels
 
     let (event_sender, event_receiver) = mpsc::channel();
@@ -46,12 +46,12 @@ pub fn create_window() -> (Arc<Mutex<Pixels>>, Receiver<WindowEvent>, JoinHandle
 
 // Build window and run event loop with event handler
 
-fn build_window(event_sender: Sender<WindowEvent>, pixels_sender: Sender<Arc<Mutex<Pixels>>>) {
+fn build_window(event_sender: Sender<UserEvent>, pixels_sender: Sender<Arc<Mutex<Pixels>>>) {
     // Create event loop and window
 
     let event_loop = EventLoopBuilder::new().with_any_thread(true).build(); // Only works on Windows
     let window = {
-        let default_size = LogicalSize::new((WIDTH * 3) as f64, (HEIGHT * 3) as f64);
+        let default_size = LogicalSize::new((WIDTH * 2) as f64, (HEIGHT * 2) as f64);
         let min_size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
         WindowBuilder::new()
             .with_title("Pong")
@@ -83,12 +83,25 @@ fn build_window(event_sender: Sender<WindowEvent>, pixels_sender: Sender<Arc<Mut
     // Run blocking event loop
 
     event_loop.run(move |event, _, control_flow| {
-        handle_events(event, control_flow, &pixels);
+        handle_events(event, control_flow, &event_sender, &pixels);
     });
 }
 
-// Send user input events to channel queue
+// Handle window events and send user input events to channel queue
 
-fn handle_events(event: Event<()>, control_flow: &mut ControlFlow, pixels: &Mutex<Pixels>) {
-    println!("handling events");
+fn handle_events(
+    event: Event<()>,
+    control_flow: &mut ControlFlow,
+    event_sender: &Sender<UserEvent>,
+    pixels: &Mutex<Pixels>,
+) {
+    // Render on redraw requested
+
+    if let Event::RedrawRequested(_) = event {
+        if let Err(error) = pixels.lock().unwrap().render() {
+            eprintln!("Error in render: {error}");
+            *control_flow = ControlFlow::Exit;
+            return;
+        }
+    }
 }

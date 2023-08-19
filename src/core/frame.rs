@@ -72,11 +72,48 @@ impl Frame {
 
     // Update game state with object positions and rerender
 
-    pub fn update(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {}
+    pub fn update(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {
+        // Apply previous changes to previous state
+
+        Self::draw_internal_state(&mut self.prev, self.prev_state, 0x00);
+        Self::draw_internal_state(&mut self.prev, self.current_state, COLOR);
+        self.prev_state = self.current_state;
+
+        // Apply changes to current state
+
+        self.current_state
+            .set_state(ball, left_paddle, right_paddle);
+        Self::draw_internal_state(&mut self.current, self.prev_state, 0x00);
+        Self::draw_internal_state(&mut self.current, self.current_state, COLOR);
+
+        // Render updated state
+
+        if let Some(pixels) = &self.pixels {
+            let mut pixels = pixels.lock().unwrap();
+            Self::draw_display_state(pixels.frame_mut(), self.prev_state, 0x00);
+            Self::draw_display_state(pixels.frame_mut(), self.current_state, COLOR);
+            pixels.render().expect("Error rendering frame");
+        }
+    }
 
     // Reset game state and clear buffers without rerender
 
-    pub fn reset(&mut self) {}
+    pub fn reset(&mut self) {
+        // Clear internal frames
+
+        Self::draw_internal_state(&mut self.prev, self.prev_state, 0x00);
+        self.prev_state = ObjectState::default();
+        Self::draw_internal_state(&mut self.current, self.current_state, 0x00);
+
+        // Clear display frame
+
+        if let Some(pixels) = &self.pixels {
+            let mut pixels = pixels.lock().unwrap();
+            Self::draw_display_state(pixels.frame_mut(), self.current_state, COLOR);
+        }
+
+        self.current_state = ObjectState::default();
+    }
 
     // Batch draw object state on internal frame
 

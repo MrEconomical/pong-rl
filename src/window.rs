@@ -14,19 +14,20 @@ use winit::window::WindowBuilder;
 
 // Window event enum
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 pub enum UserEvent {
-    PaddleInput(PaddleDir),
+    GameInput(PaddleInput),
     Exit,
 }
 
-// Paddle direction enum
+// Paddle input enum
 
 #[derive(Clone, Copy, PartialEq)]
-pub enum PaddleDir {
+pub enum PaddleInput {
     Up,
+    StopUp,
     Down,
-    Stop,
+    StopDown,
 }
 
 // Spawn window thread and return Pixels, window events channel, and events thread handle
@@ -110,68 +111,71 @@ fn handle_events(
 
     // Check user input events
 
-    if let Event::WindowEvent {
-        event: window_event,
-        ..
-    } = event
-    {
-        match window_event {
-            WindowEvent::KeyboardInput {
-                input:
-                    KeyboardInput {
-                        state: action_type,
-                        virtual_keycode: Some(key),
-                        ..
-                    },
-                ..
-            } => {
-                // Send paddle direction input to channel
+    let window_event = match event {
+        Event::WindowEvent {
+            event: window_event,
+            ..
+        } => window_event,
+        _ => return,
+    };
 
-                if action_type == ElementState::Released {
+    match window_event {
+        WindowEvent::KeyboardInput {
+            input:
+                KeyboardInput {
+                    state: action_type,
+                    virtual_keycode: Some(key),
+                    ..
+                },
+            ..
+        } => {
+            // Send paddle direction input to channel
+
+            match key {
+                VirtualKeyCode::W | VirtualKeyCode::Up => {
                     event_sender
-                        .send(UserEvent::PaddleInput(PaddleDir::Stop))
+                        .send(if action_type == ElementState::Pressed {
+                            UserEvent::GameInput(PaddleInput::Up)
+                        } else {
+                            UserEvent::GameInput(PaddleInput::StopUp)
+                        })
                         .unwrap();
                     return;
-                } else {
-                    match key {
-                        VirtualKeyCode::W | VirtualKeyCode::Up => {
-                            event_sender
-                                .send(UserEvent::PaddleInput(PaddleDir::Up))
-                                .unwrap();
-                            return;
-                        }
-                        VirtualKeyCode::S | VirtualKeyCode::Down => {
-                            event_sender
-                                .send(UserEvent::PaddleInput(PaddleDir::Down))
-                                .unwrap();
-                            return;
-                        }
-                        _ => (),
-                    }
                 }
-            }
-            WindowEvent::Resized(size) => {
-                // Resize Pixels surface on window resize
-
-                if let Err(error) = pixels
-                    .lock()
-                    .unwrap()
-                    .resize_surface(size.width, size.height)
-                {
-                    eprintln!("Error in resize: {error}");
-                    let _ = event_sender.send(UserEvent::Exit);
-                    *control_flow = ControlFlow::Exit;
+                VirtualKeyCode::S | VirtualKeyCode::Down => {
+                    event_sender
+                        .send(if action_type == ElementState::Pressed {
+                            UserEvent::GameInput(PaddleInput::Down)
+                        } else {
+                            UserEvent::GameInput(PaddleInput::StopDown)
+                        })
+                        .unwrap();
                     return;
                 }
+                _ => (),
             }
-            WindowEvent::CloseRequested | WindowEvent::Destroyed => {
-                // Exit event loop on window close
+        }
+        WindowEvent::Resized(size) => {
+            // Resize Pixels surface on window resize
 
-                event_sender.send(UserEvent::Exit).unwrap();
+            if let Err(error) = pixels
+                .lock()
+                .unwrap()
+                .resize_surface(size.width, size.height)
+            {
+                eprintln!("Error in resize: {error}");
+                let _ = event_sender.send(UserEvent::Exit);
                 *control_flow = ControlFlow::Exit;
                 return;
             }
-            _ => (),
         }
+        WindowEvent::CloseRequested | WindowEvent::Destroyed => {
+            // Exit event loop on window close
+
+            event_sender.send(UserEvent::Exit).unwrap();
+            *control_flow = ControlFlow::Exit;
+            return;
+        }
+        _ => (),
     }
 }

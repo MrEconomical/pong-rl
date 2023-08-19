@@ -1,6 +1,6 @@
 use crate::core::Pong;
 use crate::window;
-use crate::window::{PaddleDir, UserEvent};
+use crate::window::{PaddleInput, UserEvent};
 use std::sync::mpsc::Receiver;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;

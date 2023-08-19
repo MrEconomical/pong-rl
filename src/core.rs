@@ -1,5 +1,6 @@
 mod frame;
 
+use crate::config::{BALL_SIZE, HEIGHT, PADDLE_HEIGHT, PADDLE_OFFSET, PADDLE_WIDTH, WIDTH};
 use frame::{Frame, Point};
 use std::sync::{Arc, Mutex};
 
@@ -96,7 +97,10 @@ impl Pong {
     // Return initial game values
 
     fn initial_ball_pos() -> FloatPoint {
-        FloatPoint(0.0, 0.0)
+        FloatPoint(
+            (WIDTH / 2 - BALL_SIZE / 2) as f64,
+            (HEIGHT / 2 - BALL_SIZE / 2) as f64,
+        )
     }
 
     fn random_ball_velocity() -> Velocity {
@@ -104,10 +108,13 @@ impl Pong {
     }
 
     fn initial_left_paddle_pos() -> Point {
-        Point(0, 0)
+        Point(PADDLE_OFFSET, HEIGHT / 2 - PADDLE_HEIGHT / 2)
     }
 
     fn initial_right_paddle_pos() -> Point {
-        Point(0, 0)
+        Point(
+            WIDTH - PADDLE_OFFSET - PADDLE_WIDTH,
+            HEIGHT / 2 - PADDLE_HEIGHT / 2,
+        )
     }
 }

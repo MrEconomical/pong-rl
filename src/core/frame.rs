@@ -5,7 +5,7 @@ use pixels::Pixels;
 
 // Frame coordinate position struct
 
-#[derive(Clone, Copy, Default, PartialEq)]
+#[derive(Clone, Copy, Default, PartialEq, Debug)]
 pub struct Point(pub usize, pub usize);
 
 // Game object position struct
@@ -30,9 +30,9 @@ impl ObjectState {
 // Pong game display frame buffer struct
 
 pub struct Frame {
-    prev: [u8; WIDTH * HEIGHT],
+    prev: [u8; HEIGHT * WIDTH],
     prev_state: ObjectState,
-    current: [u8; WIDTH * HEIGHT],
+    current: [u8; HEIGHT * WIDTH],
     current_state: ObjectState,
     pixels: Option<Arc<Mutex<Pixels>>>,
 }
@@ -42,9 +42,9 @@ impl Frame {
 
     pub fn zeroed(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Self {
-            prev: [0; WIDTH * HEIGHT],
+            prev: [0; HEIGHT * WIDTH],
             prev_state: ObjectState::default(),
-            current: [0; WIDTH * HEIGHT],
+            current: [0; HEIGHT * WIDTH],
             current_state: ObjectState::default(),
             pixels,
         }
@@ -89,8 +89,8 @@ impl Frame {
     // Draw rectangle on internal frame at position with width and height
 
     fn draw_internal(frame: &mut [u8], pos: Point, width: usize, height: usize) {
-        for row in pos.0..pos.0 + height {
-            for col in pos.1..pos.1 + width {
+        for row in pos.1..pos.1 + height {
+            for col in pos.0..pos.0 + width {
                 frame[row * WIDTH + col] = COLOR;
             }
         }
@@ -99,8 +99,8 @@ impl Frame {
     // Draw rectangle on Pixels RGBA frame at position with width and height
 
     fn draw_display(rgba_frame: &mut [u8], pos: Point, width: usize, height: usize) {
-        for row in pos.0..pos.0 + height {
-            for col in pos.1..pos.1 + width {
+        for row in pos.1..pos.1 + height {
+            for col in pos.0..pos.0 + width {
                 let offset = (row * WIDTH + col) * 4;
                 rgba_frame[offset] = COLOR;
                 rgba_frame[offset + 1] = COLOR;

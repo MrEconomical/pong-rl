@@ -1,9 +1,14 @@
 mod frame;
 
-use frame::{Frame, Point, PosChange};
+use frame::{Frame, Point};
 use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
+
+// Fractional position struct
+
+#[derive(Clone, Copy)]
+struct FloatPoint(pub f64, pub f64);
 
 // Ball velocity struct
 
@@ -16,7 +21,7 @@ struct Velocity {
 // Core Pong game struct
 
 pub struct Pong {
-    ball: Point,
+    ball: FloatPoint,
     ball_velocity: Velocity,
     left_paddle: Point,
     right_paddle: Point,
@@ -49,8 +54,8 @@ impl Pong {
 
     // Calculate initial game values
 
-    fn initial_ball_pos() -> Point {
-        Point(0, 0)
+    fn initial_ball_pos() -> FloatPoint {
+        FloatPoint(0.0, 0.0)
     }
 
     fn random_ball_velocity() -> Velocity {

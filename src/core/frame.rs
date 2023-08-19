@@ -5,22 +5,25 @@ use pixels::Pixels;
 
 // Frame coordinate position struct
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub struct Point(pub usize, pub usize);
 
-// Coordinate position change tracker struct
+// Game object position struct
 
-#[derive(Clone, Copy)]
-pub struct PosChange {
-    prev: Point,
-    current: Point,
+#[derive(Default)]
+struct ObjectState {
+    ball: Point,
+    left_paddle: Point,
+    right_paddle: Point,
 }
 
 // Pong game display frame buffer struct
 
 pub struct Frame {
     prev: [u8; WIDTH * HEIGHT],
+    prev_state: ObjectState,
     current: [u8; WIDTH * HEIGHT],
+    current_state: ObjectState,
     pixels: Option<Arc<Mutex<Pixels>>>,
 }
 
@@ -30,7 +33,9 @@ impl Frame {
     pub fn new(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Self {
             prev: [0; WIDTH * HEIGHT],
+            prev_state: ObjectState::default(),
             current: [0; WIDTH * HEIGHT],
+            current_state: ObjectState::default(),
             pixels,
         }
     }

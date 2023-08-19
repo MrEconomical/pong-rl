@@ -1,4 +1,4 @@
-use crate::core::Pong;
+use crate::core::{GameResult, PaddleMove, Pong};
 use crate::window;
 use crate::window::{PaddleInput, UserEvent};
 use std::sync::mpsc::Receiver;

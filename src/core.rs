@@ -18,6 +18,21 @@ struct Velocity {
     pub y: f64,
 }
 
+// Paddle movement input direction enum
+
+pub enum PaddleMove {
+    Up,
+    Down,
+    None,
+}
+
+// User game result enum
+
+pub enum GameResult {
+    Win,
+    Lose,
+}
+
 // Core Pong game struct
 
 pub struct Pong {
@@ -26,6 +41,7 @@ pub struct Pong {
     left_paddle: Point,
     right_paddle: Point,
     frame: Frame,
+    ended: bool,
 }
 
 impl Pong {
@@ -38,6 +54,7 @@ impl Pong {
             left_paddle: Pong::initial_left_paddle_pos(),
             right_paddle: Pong::initial_right_paddle_pos(),
             frame: Frame::zeroed(pixels),
+            ended: false,
         }
     }
 
@@ -51,6 +68,12 @@ impl Pong {
         );
     }
 
+    // Advance game with user action and return game state
+
+    pub fn tick(&mut self) -> Option<GameResult> {
+        unimplemented!();
+    }
+
     // Reset game without rerender
 
     pub fn reset(&mut self) {
@@ -59,6 +82,7 @@ impl Pong {
         self.ball_velocity = Pong::random_ball_velocity();
         self.left_paddle = Pong::initial_left_paddle_pos();
         self.right_paddle = Pong::initial_right_paddle_pos();
+        self.ended = false;
     }
 
     // Convert fractional position to approximate position

@@ -26,4 +26,22 @@ impl PongGame {
             window_handle,
         }
     }
+
+    // Clear input buffer and start pong game with initial state
+
+    pub fn start(&mut self) {
+        self.pong.start_game();
+    }
+
+    // Advance game and return game state
+
+    pub fn tick(&mut self) -> Option<GameResult> {
+        unimplemented!();
+    }
+
+    // Reset game to initial state
+
+    pub fn reset(&mut self) {
+        self.pong.clear_game();
+    }
 }

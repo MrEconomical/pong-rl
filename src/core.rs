@@ -61,7 +61,7 @@ impl Pong {
 
     // Render initial frame with initial state
 
-    pub fn start(&mut self) {
+    pub fn start_game(&mut self) {
         self.frame.init_state(
             Self::round_pos(self.ball),
             self.left_paddle,
@@ -72,12 +72,13 @@ impl Pong {
     // Advance game with user action and return game state
 
     pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
+        assert!(!self.ended, "cannot tick after game end");
         unimplemented!();
     }
 
     // Reset game without rerender
 
-    pub fn reset(&mut self) {
+    pub fn clear_game(&mut self) {
         self.frame.reset();
         self.ball = Pong::initial_ball_pos();
         self.ball_velocity = Pong::random_ball_velocity();

@@ -10,6 +10,8 @@ use env::PongEnv;
 
 use pyo3::prelude::*;
 
+// Export Pong game environment to Python
+
 #[pymodule]
 fn pong_rl(_: Python<'_>, module: &PyModule) -> PyResult<()> {
     module.add_class::<PongEnv>()?;

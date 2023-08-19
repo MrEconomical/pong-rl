@@ -34,33 +34,4 @@ impl Frame {
             pixels,
         }
     }
-
-    // Draw game state directly on current buffer assuming all buffers are zeroed
-
-    pub fn force_draw(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {}
-
-    // Clear buffers and reset Pixels display
-
-    pub fn reset(&mut self, with_render: bool) {
-        self.prev.fill(0);
-        self.current.fill(0);
-
-        if let Some(pixels) = &self.pixels {
-            let mut pixels = pixels.lock().unwrap();
-            pixels.frame_mut().fill(0);
-            if with_render {
-                pixels.render().expect("error rendering frame");
-            }
-        }
-    }
-
-    // Draw ball at position on buffer
-
-    fn draw_ball(frame: &mut [u8], ball: Point) {
-        for row in ball.1..ball.1 + BALL_SIZE {
-            for col in ball.0..ball.0 + BALL_SIZE {
-                // todo: figure out how the texture format works
-            }
-        }
-    }
 }

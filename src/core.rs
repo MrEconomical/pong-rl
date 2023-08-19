@@ -39,13 +39,12 @@ impl Pong {
     // Reset game and frame buffers
 
     pub fn reset(&mut self) {
-        self.frame.reset(false);
+        // todo: reset frame
         self.ball = Pong::initial_ball_pos();
         self.ball_velocity = Pong::random_ball_velocity();
         self.left_paddle = Pong::initial_left_paddle_pos();
         self.right_paddle = Pong::initial_right_paddle_pos();
-        self.frame
-            .force_draw(self.ball, self.left_paddle, self.right_paddle);
+        // todo: draw on frame
     }
 
     // Calculate initial game values

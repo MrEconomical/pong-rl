@@ -102,7 +102,7 @@ fn handle_events(
 
     if let Event::RedrawRequested(_) = event {
         if let Err(error) = pixels.lock().unwrap().render() {
-            eprintln!("Error in render: {error}");
+            eprintln!("Error rendering on redraw: {error}");
             let _ = event_sender.send(UserEvent::Exit);
             *control_flow = ControlFlow::Exit;
             return;
@@ -163,7 +163,7 @@ fn handle_events(
                 .unwrap()
                 .resize_surface(size.width, size.height)
             {
-                eprintln!("Error in resize: {error}");
+                eprintln!("Error rendering on resize: {error}");
                 let _ = event_sender.send(UserEvent::Exit);
                 *control_flow = ControlFlow::Exit;
                 return;

@@ -14,4 +14,5 @@ path = "src/main.rs"
 [dependencies]
 pixels = "0.13.0"
 pyo3 = { version = "0.19.2", features = ["extension-module"] }
+rand = "0.8.5"
 winit = "0.27.1"

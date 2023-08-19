@@ -1,10 +1,14 @@
 mod frame;
 
-use crate::config::{BALL_SIZE, HEIGHT, PADDLE_HEIGHT, PADDLE_OFFSET, PADDLE_WIDTH, WIDTH};
+use crate::config::{
+    BALL_SIZE, BALL_SPEED, HEIGHT, MAX_BALL_ANGLE, MAX_INITIAL_ANGLE, PADDLE_HEIGHT, PADDLE_OFFSET,
+    PADDLE_SPEED, PADDLE_WIDTH, WIDTH,
+};
 use frame::{Frame, Point};
 use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
+use rand::Rng;
 
 // Fractional position struct
 
@@ -52,7 +56,7 @@ impl Pong {
     pub fn new(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Pong {
             ball: Pong::initial_ball_pos(),
-            ball_velocity: Pong::random_ball_velocity(),
+            ball_velocity: Pong::random_initial_velocity(),
             left_paddle: Pong::initial_left_paddle_pos(),
             right_paddle: Pong::initial_right_paddle_pos(),
             frame: Frame::zeroed(pixels),
@@ -73,7 +77,7 @@ impl Pong {
     // Advance game with user action and return game state
 
     pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
-        assert!(!self.ended, "cannot tick after game end");
+        assert!(!self.ended, "cannot run tick after game end");
         unimplemented!();
     }
 
@@ -82,7 +86,7 @@ impl Pong {
     pub fn clear_game(&mut self) {
         self.frame.reset();
         self.ball = Pong::initial_ball_pos();
-        self.ball_velocity = Pong::random_ball_velocity();
+        self.ball_velocity = Pong::random_initial_velocity();
         self.left_paddle = Pong::initial_left_paddle_pos();
         self.right_paddle = Pong::initial_right_paddle_pos();
         self.ended = false;
@@ -103,8 +107,22 @@ impl Pong {
         )
     }
 
-    fn random_ball_velocity() -> Velocity {
-        Velocity { x: 0.0, y: 0.0 }
+    fn random_initial_velocity() -> Velocity {
+        let angle = rand::thread_rng().gen_range(-MAX_INITIAL_ANGLE..MAX_INITIAL_ANGLE);
+        let x_velocity = BALL_SPEED * angle.to_radians().cos();
+        let y_velocity = BALL_SPEED * angle.to_radians().sin();
+
+        if rand::thread_rng().gen_bool(0.5) {
+            Velocity {
+                x: x_velocity,
+                y: y_velocity,
+            }
+        } else {
+            Velocity {
+                x: -x_velocity,
+                y: y_velocity,
+            }
+        }
     }
 
     fn initial_left_paddle_pos() -> Point {

@@ -23,7 +23,6 @@ struct Velocity {
 pub enum PaddleMove {
     Up,
     Down,
-    None,
 }
 
 // User game result enum
@@ -70,7 +69,7 @@ impl Pong {
 
     // Advance game with user action and return game state
 
-    pub fn tick(&mut self) -> Option<GameResult> {
+    pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
         unimplemented!();
     }
 

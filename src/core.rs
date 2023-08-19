@@ -37,7 +37,7 @@ impl Pong {
             ball_velocity: Pong::random_ball_velocity(),
             left_paddle: Pong::initial_left_paddle_pos(),
             right_paddle: Pong::initial_right_paddle_pos(),
-            frame: Frame::new(pixels),
+            frame: Frame::zeroed(pixels),
         }
     }
 

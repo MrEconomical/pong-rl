@@ -30,7 +30,7 @@ pub struct Frame {
 impl Frame {
     // Initialize zeroed frame buffers with optional Pixels display
 
-    pub fn new(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
+    pub fn zeroed(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Self {
             prev: [0; WIDTH * HEIGHT],
             prev_state: ObjectState::default(),

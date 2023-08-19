@@ -4,7 +4,8 @@ mod env;
 mod game;
 mod window;
 
-pub use game::PongGame;
+pub use config::FRAME_DELAY;
+pub use game::{PongGame, TickResult};
 
 use env::PongEnv;
 

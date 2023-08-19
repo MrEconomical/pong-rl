@@ -2,6 +2,7 @@
 
 pub const WIDTH: usize = 240;
 pub const HEIGHT: usize = 150;
+pub const FRAME_DELAY: u64 = 1000;
 
 pub const BALL_SIZE: usize = 3;
 pub const BALL_SPEED: f64 = 8.0;

@@ -7,12 +7,19 @@ use std::thread::JoinHandle;
 
 use pixels::Pixels;
 
+// Game tick result enum
+
+pub enum TickResult {
+    GameEnd,
+    Exit,
+}
+
 // User-controlled Pong game struct
 
 pub struct PongGame {
     pong: Pong,
     event_channel: Receiver<UserEvent>,
-    pub window_handle: JoinHandle<()>,
+    window_handle: JoinHandle<()>,
 }
 
 impl PongGame {
@@ -35,7 +42,7 @@ impl PongGame {
 
     // Advance game and return game state
 
-    pub fn tick(&mut self) -> Option<GameResult> {
+    pub fn tick(&mut self) -> Option<TickResult> {
         unimplemented!();
     }
 
@@ -43,5 +50,13 @@ impl PongGame {
 
     pub fn reset(&mut self) {
         self.pong.clear_game();
+    }
+
+    // Run window thread to completion
+
+    pub fn run_window(self) {
+        self.window_handle
+            .join()
+            .expect("Error running window thread to completion");
     }
 }

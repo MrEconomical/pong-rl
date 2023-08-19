@@ -20,6 +20,7 @@ struct Velocity {
 
 // Paddle movement input direction enum
 
+#[derive(Clone, Copy)]
 pub enum PaddleMove {
     Up,
     Down,
@@ -27,6 +28,7 @@ pub enum PaddleMove {
 
 // User game result enum
 
+#[derive(Clone, Copy)]
 pub enum GameResult {
     Win,
     Lose,

@@ -22,7 +22,7 @@ pub enum UserEvent {
 
 // Paddle input enum
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy)]
 pub enum PaddleInput {
     Up,
     StopUp,

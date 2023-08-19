@@ -8,14 +8,14 @@ use pixels::Pixels;
 // Fractional position struct
 
 #[derive(Clone, Copy)]
-struct FloatPoint(pub f64, pub f64);
+struct FloatPoint(f64, f64);
 
 // Ball velocity struct
 
 #[derive(Clone, Copy)]
 struct Velocity {
-    pub x: f64,
-    pub y: f64,
+    x: f64,
+    y: f64,
 }
 
 // Paddle movement input direction enum

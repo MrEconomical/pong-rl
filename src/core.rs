@@ -41,18 +41,33 @@ impl Pong {
         }
     }
 
-    // Reset game and frame buffers
+    // Render initial frame with initial state
+
+    pub fn start(&mut self) {
+        self.frame.init_state(
+            Self::round_pos(self.ball),
+            self.left_paddle,
+            self.right_paddle,
+        );
+    }
+
+    // Reset game without rerender
 
     pub fn reset(&mut self) {
-        // todo: reset frame
+        self.frame.reset();
         self.ball = Pong::initial_ball_pos();
         self.ball_velocity = Pong::random_ball_velocity();
         self.left_paddle = Pong::initial_left_paddle_pos();
         self.right_paddle = Pong::initial_right_paddle_pos();
-        // todo: draw on frame
     }
 
-    // Calculate initial game values
+    // Convert fractional position to approximate position
+
+    fn round_pos(pos: FloatPoint) -> Point {
+        Point(pos.0.round() as usize, pos.1.round() as usize)
+    }
+
+    // Return initial game values
 
     fn initial_ball_pos() -> FloatPoint {
         FloatPoint(0.0, 0.0)

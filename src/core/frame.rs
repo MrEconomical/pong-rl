@@ -39,4 +39,16 @@ impl Frame {
             pixels,
         }
     }
+
+    // Initialize object state assuming zeroed buffers and render frame
+
+    pub fn init_state(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {}
+
+    // Update game state with object positions and rerender
+
+    pub fn update(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {}
+
+    // Reset game state and clear buffers without rerender
+
+    pub fn reset(&mut self) {}
 }

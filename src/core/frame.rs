@@ -5,12 +5,12 @@ use pixels::Pixels;
 
 // Frame coordinate position struct
 
-#[derive(Clone, Copy, Default, PartialEq, Debug)]
+#[derive(Clone, Copy, Default, PartialEq)]
 pub struct Point(pub usize, pub usize);
 
 // Game object position struct
 
-#[derive(Default)]
+#[derive(Clone, Copy, Default)]
 struct ObjectState {
     ball: Point,
     left_paddle: Point,
@@ -56,24 +56,16 @@ impl Frame {
         // Set internal frame states
 
         self.prev_state.set_state(ball, left_paddle, right_paddle);
-        Self::draw_internal(&mut self.prev, ball, BALL_SIZE, BALL_SIZE);
-        Self::draw_internal(&mut self.prev, left_paddle, PADDLE_WIDTH, PADDLE_HEIGHT);
-        Self::draw_internal(&mut self.prev, right_paddle, PADDLE_WIDTH, PADDLE_HEIGHT);
-
+        Self::draw_internal_state(&mut self.prev, self.prev_state, COLOR);
         self.current_state
             .set_state(ball, left_paddle, right_paddle);
-        Self::draw_internal(&mut self.current, ball, BALL_SIZE, BALL_SIZE);
-        Self::draw_internal(&mut self.current, left_paddle, PADDLE_WIDTH, PADDLE_HEIGHT);
-        Self::draw_internal(&mut self.current, right_paddle, PADDLE_WIDTH, PADDLE_HEIGHT);
+        Self::draw_internal_state(&mut self.current, self.current_state, COLOR);
 
         // Set display frame state and render frame
 
         if let Some(pixels) = &self.pixels {
             let mut pixels = pixels.lock().unwrap();
-            let pixels_frame = pixels.frame_mut();
-            Self::draw_display(pixels_frame, ball, BALL_SIZE, BALL_SIZE);
-            Self::draw_display(pixels_frame, left_paddle, PADDLE_WIDTH, PADDLE_HEIGHT);
-            Self::draw_display(pixels_frame, right_paddle, PADDLE_WIDTH, PADDLE_HEIGHT);
+            Self::draw_display_state(pixels.frame_mut(), self.current_state, COLOR);
             pixels.render().expect("Error rendering frame");
         }
     }
@@ -86,25 +78,59 @@ impl Frame {
 
     pub fn reset(&mut self) {}
 
+    // Batch draw object state on internal frame
+
+    fn draw_internal_state(frame: &mut [u8], state: ObjectState, color: u8) {
+        Self::draw_internal(frame, state.ball, BALL_SIZE, BALL_SIZE, color);
+        Self::draw_internal(frame, state.left_paddle, PADDLE_WIDTH, PADDLE_HEIGHT, color);
+        Self::draw_internal(
+            frame,
+            state.right_paddle,
+            PADDLE_WIDTH,
+            PADDLE_HEIGHT,
+            color,
+        );
+    }
+
+    // Batch draw object state on Pixels RGBA frame
+
+    fn draw_display_state(rgba_frame: &mut [u8], state: ObjectState, color: u8) {
+        Self::draw_display(rgba_frame, state.ball, BALL_SIZE, BALL_SIZE, color);
+        Self::draw_display(
+            rgba_frame,
+            state.left_paddle,
+            PADDLE_WIDTH,
+            PADDLE_HEIGHT,
+            color,
+        );
+        Self::draw_display(
+            rgba_frame,
+            state.right_paddle,
+            PADDLE_WIDTH,
+            PADDLE_HEIGHT,
+            color,
+        );
+    }
+
     // Draw rectangle on internal frame at position with width and height
 
-    fn draw_internal(frame: &mut [u8], pos: Point, width: usize, height: usize) {
+    fn draw_internal(frame: &mut [u8], pos: Point, width: usize, height: usize, color: u8) {
         for row in pos.1..pos.1 + height {
             for col in pos.0..pos.0 + width {
-                frame[row * WIDTH + col] = COLOR;
+                frame[row * WIDTH + col] = color;
             }
         }
     }
 
     // Draw rectangle on Pixels RGBA frame at position with width and height
 
-    fn draw_display(rgba_frame: &mut [u8], pos: Point, width: usize, height: usize) {
+    fn draw_display(rgba_frame: &mut [u8], pos: Point, width: usize, height: usize, color: u8) {
         for row in pos.1..pos.1 + height {
             for col in pos.0..pos.0 + width {
                 let offset = (row * WIDTH + col) * 4;
-                rgba_frame[offset] = COLOR;
-                rgba_frame[offset + 1] = COLOR;
-                rgba_frame[offset + 2] = COLOR;
+                rgba_frame[offset] = color;
+                rgba_frame[offset + 1] = color;
+                rgba_frame[offset + 2] = color;
                 rgba_frame[offset + 3] = 0xFF;
             }
         }

@@ -1,5 +1,5 @@
 use super::render;
-use crate::config::{BALL_SIZE, COLOR, HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, WIDTH};
+use crate::config::{COLOR, PADDLE_HEIGHT, PADDLE_WIDTH};
 use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
@@ -23,7 +23,7 @@ struct ObjectState {
 }
 
 impl ObjectState {
-    // Batch set position values
+    // Batch set position values and calculate rounded ball position
 
     fn set_state(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
         self.ball = ball;
@@ -33,7 +33,7 @@ impl ObjectState {
     }
 }
 
-// Pong game display frame buffer struct
+// Pong game display frame struct
 
 pub struct Frame {
     state: ObjectState,

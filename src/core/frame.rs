@@ -33,9 +33,9 @@ impl ObjectState {
 // Pong game display frame buffer struct
 
 pub struct Frame {
-    prev: [u8; HEIGHT * WIDTH],
+    prev: Vec<u8>,
     prev_state: ObjectState,
-    current: [u8; HEIGHT * WIDTH],
+    current: Vec<u8>,
     current_state: ObjectState,
     pixels: Option<Arc<Mutex<Pixels>>>,
 }
@@ -45,9 +45,9 @@ impl Frame {
 
     pub fn zeroed(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Self {
-            prev: [0; HEIGHT * WIDTH],
+            prev: vec![0; HEIGHT * WIDTH],
             prev_state: ObjectState::default(),
-            current: [0; HEIGHT * WIDTH],
+            current: vec![0; HEIGHT * WIDTH],
             current_state: ObjectState::default(),
             pixels,
         }

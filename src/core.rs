@@ -120,19 +120,9 @@ impl Pong {
 
     fn random_initial_velocity() -> Velocity {
         let angle = rand::thread_rng().gen_range(-MAX_INITIAL_ANGLE..MAX_INITIAL_ANGLE);
-        let x_velocity = BALL_SPEED * angle.to_radians().cos();
-        let y_velocity = BALL_SPEED * angle.to_radians().sin();
-
-        if rand::thread_rng().gen_bool(0.5) {
-            Velocity {
-                x: x_velocity,
-                y: y_velocity,
-            }
-        } else {
-            Velocity {
-                x: -x_velocity,
-                y: y_velocity,
-            }
+        Velocity {
+            x: BALL_SPEED * angle.to_radians().cos(),
+            y: BALL_SPEED * angle.to_radians().sin(),
         }
     }
 

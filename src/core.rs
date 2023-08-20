@@ -1,4 +1,5 @@
 mod frame;
+mod render;
 
 use crate::config::{
     BALL_SIZE, BALL_SPEED, HEIGHT, MAX_BALL_ANGLE, MAX_INITIAL_ANGLE, PADDLE_HEIGHT, PADDLE_OFFSET,

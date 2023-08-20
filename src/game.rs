@@ -43,7 +43,8 @@ impl PongGame {
     // Advance game and return game state
 
     pub fn tick(&mut self) -> Option<TickResult> {
-        unimplemented!();
+        self.pong.tick(None);
+        None
     }
 
     // Reset game to initial state

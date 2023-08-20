@@ -4,16 +4,11 @@ use crate::config::{
     BALL_SIZE, BALL_SPEED, HEIGHT, MAX_BALL_ANGLE, MAX_INITIAL_ANGLE, PADDLE_HEIGHT, PADDLE_OFFSET,
     PADDLE_SPEED, PADDLE_WIDTH, WIDTH,
 };
-use frame::{Frame, Point};
+use frame::{FloatPoint, Frame, Point};
 use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
 use rand::Rng;
-
-// Fractional position struct
-
-#[derive(Clone, Copy)]
-struct FloatPoint(f64, f64);
 
 // Ball velocity struct
 
@@ -67,18 +62,31 @@ impl Pong {
     // Render initial frame with initial state
 
     pub fn start_game(&mut self) {
-        self.frame.init_state(
-            Self::round_pos(self.ball),
-            self.left_paddle,
-            self.right_paddle,
-        );
+        self.frame
+            .init_state(self.ball, self.left_paddle, self.right_paddle);
     }
 
     // Advance game with user action and return game state
 
     pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
         assert!(!self.ended, "cannot run tick after game end");
-        unimplemented!();
+
+        // Update ball position
+
+        let game_result = self.move_ball(FloatPoint(
+            self.ball.0 + self.ball_velocity.x,
+            self.ball.1 + self.ball_velocity.y,
+        ));
+
+        // Update frame with new state
+
+        self.frame
+            .update(self.ball, self.left_paddle, self.right_paddle);
+
+        if let Some(_) = game_result {
+            self.ended = true;
+        }
+        game_result
     }
 
     // Reset game without rerender
@@ -92,10 +100,12 @@ impl Pong {
         self.ended = false;
     }
 
-    // Convert fractional position to approximate position
+    // Move ball with collision detection and return if game ended
 
-    fn round_pos(pos: FloatPoint) -> Point {
-        Point(pos.0.round() as usize, pos.1.round() as usize)
+    fn move_ball(&mut self, to: FloatPoint) -> Option<GameResult> {
+        println!("moving ball to {} {}", to.0, to.1);
+        self.ball = to;
+        None
     }
 
     // Return initial game values

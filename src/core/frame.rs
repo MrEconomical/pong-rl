@@ -3,16 +3,18 @@ use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
 
-// Frame coordinate position struct
+// Frame coordinate position structs
 
-#[derive(Clone, Copy, Default, PartialEq)]
+#[derive(Clone, Copy, Default)]
 pub struct Point(pub usize, pub usize);
+#[derive(Clone, Copy, Default)]
+pub struct FloatPoint(pub f64, pub f64);
 
 // Game object position struct
 
 #[derive(Clone, Copy, Default)]
 struct ObjectState {
-    ball: Point,
+    ball: FloatPoint,
     left_paddle: Point,
     right_paddle: Point,
 }
@@ -20,7 +22,7 @@ struct ObjectState {
 impl ObjectState {
     // Batch set position values
 
-    fn set_state(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {
+    fn set_state(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
         self.ball = ball;
         self.left_paddle = left_paddle;
         self.right_paddle = right_paddle;
@@ -52,7 +54,7 @@ impl Frame {
 
     // Initialize frame state assuming zeroed buffers and render frame
 
-    pub fn init_state(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {
+    pub fn init_state(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
         // Set internal frame states
 
         self.prev_state.set_state(ball, left_paddle, right_paddle);
@@ -72,7 +74,7 @@ impl Frame {
 
     // Update game state with object positions and rerender
 
-    pub fn update(&mut self, ball: Point, left_paddle: Point, right_paddle: Point) {
+    pub fn update(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
         // Apply previous changes to previous state
 
         Self::draw_internal_state(&mut self.prev, self.prev_state, 0x00);
@@ -118,7 +120,7 @@ impl Frame {
     // Batch draw object state on internal frame
 
     fn draw_internal_state(frame: &mut [u8], state: ObjectState, color: u8) {
-        Self::draw_internal(frame, state.ball, BALL_SIZE, BALL_SIZE, color);
+        Self::draw_ball_internal(frame, state.ball, color);
         Self::draw_internal(frame, state.left_paddle, PADDLE_WIDTH, PADDLE_HEIGHT, color);
         Self::draw_internal(
             frame,
@@ -132,7 +134,7 @@ impl Frame {
     // Batch draw object state on Pixels RGBA frame
 
     fn draw_display_state(rgba_frame: &mut [u8], state: ObjectState, color: u8) {
-        Self::draw_display(rgba_frame, state.ball, BALL_SIZE, BALL_SIZE, color);
+        Self::draw_ball_display(rgba_frame, state.ball, color);
         Self::draw_display(
             rgba_frame,
             state.left_paddle,
@@ -148,6 +150,14 @@ impl Frame {
             color,
         );
     }
+
+    // Draw ball on internal frame at position with subpixel rendering
+
+    fn draw_ball_internal(frame: &mut [u8], pos: FloatPoint, color: u8) {}
+
+    // Draw ball on Pixels RGBA frame at position with subpixel rendering
+
+    fn draw_ball_display(rgba_grame: &mut [u8], pos: FloatPoint, color: u8) {}
 
     // Draw rectangle on internal frame at position with width and height
 

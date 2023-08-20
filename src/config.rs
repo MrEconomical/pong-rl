@@ -2,7 +2,7 @@
 
 pub const WIDTH: usize = 800;
 pub const HEIGHT: usize = 480;
-pub const RESCALE: u32 = 4;
+pub const RESCALE: usize = 4;
 pub const FRAME_DELAY: u64 = 33;
 
 pub const BALL_SIZE: usize = 10;

@@ -1,21 +1,9 @@
 use super::frame::{FloatPoint, Point};
-use crate::config::{BALL_SIZE, WIDTH};
-
-// Draw ball on internal frame at position with subpixel rendering
-
-pub fn draw_ball_internal(frame: &mut [u8], pos: FloatPoint, color: u8) {
-    let (start_pos, ball_pixels) = calc_ball_pixels(pos, color);
-    for row in 0..BALL_SIZE + 1 {
-        for col in 0..BALL_SIZE + 1 {
-            let offset = (start_pos.1 + row) * WIDTH + start_pos.0 + col;
-            frame[offset] = ball_pixels[row][col];
-        }
-    }
-}
+use crate::config::{BALL_SIZE, COLOR, WIDTH};
 
 // Draw ball on Pixels RGBA frame at position with subpixel rendering
 
-pub fn draw_ball_display(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
+pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
     let (start_pos, ball_pixels) = calc_ball_pixels(pos, color);
     for row in 0..BALL_SIZE + 1 {
         for col in 0..BALL_SIZE + 1 {
@@ -28,19 +16,9 @@ pub fn draw_ball_display(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
     }
 }
 
-// Draw rectangle on internal frame at position with width and height
-
-pub fn draw_internal(frame: &mut [u8], pos: Point, width: usize, height: usize, color: u8) {
-    for row in pos.1..pos.1 + height {
-        for col in pos.0..pos.0 + width {
-            frame[row * WIDTH + col] = color;
-        }
-    }
-}
-
 // Draw rectangle on Pixels RGBA frame at position with width and height
 
-pub fn draw_display(rgba_frame: &mut [u8], pos: Point, width: usize, height: usize, color: u8) {
+pub fn draw_rect(rgba_frame: &mut [u8], pos: Point, width: usize, height: usize, color: u8) {
     for row in pos.1..pos.1 + height {
         for col in pos.0..pos.0 + width {
             let offset = (row * WIDTH + col) * 4;
@@ -88,14 +66,17 @@ fn calc_ball_pixels(pos: FloatPoint, color: u8) -> (Point, [[u8; BALL_SIZE + 1];
                 1.0
             };
 
+            // Scale color intensity and discard dim colors
+
+            const CUTOFF: u8 = (COLOR as f64 * 0.8) as u8;
             let square_color = (width * height * color as f64).round() as u8;
-            let square_color = if square_color >= 204 {
+            let square_color = if square_color >= CUTOFF {
                 square_color
             } else {
-                204 - (204 - square_color) / 2
+                CUTOFF - (CUTOFF - square_color) / 2
             };
 
-            const MIN_COLOR: u8 = 128;
+            const MIN_COLOR: u8 = COLOR / 2;
             ball_pixels[row][col] = if square_color >= MIN_COLOR {
                 square_color
             } else {

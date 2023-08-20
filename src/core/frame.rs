@@ -8,6 +8,7 @@ use pixels::Pixels;
 
 #[derive(Clone, Copy, Default)]
 pub struct Point(pub usize, pub usize);
+
 #[derive(Clone, Copy, Default)]
 pub struct FloatPoint(pub f64, pub f64);
 
@@ -16,6 +17,7 @@ pub struct FloatPoint(pub f64, pub f64);
 #[derive(Clone, Copy, Default)]
 struct ObjectState {
     ball: FloatPoint,
+    ball_pos: Point,
     left_paddle: Point,
     right_paddle: Point,
 }
@@ -25,6 +27,7 @@ impl ObjectState {
 
     fn set_state(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
         self.ball = ball;
+        self.ball_pos = Point(ball.0.floor() as usize, ball.1.floor() as usize);
         self.left_paddle = left_paddle;
         self.right_paddle = right_paddle;
     }
@@ -33,42 +36,27 @@ impl ObjectState {
 // Pong game display frame buffer struct
 
 pub struct Frame {
-    prev: Vec<u8>,
-    prev_state: ObjectState,
-    current: Vec<u8>,
-    current_state: ObjectState,
+    state: ObjectState,
     pixels: Option<Arc<Mutex<Pixels>>>,
 }
 
 impl Frame {
-    // Initialize zeroed frame buffers with optional Pixels display
+    // Create empty frame with optional Pixels display
 
-    pub fn zeroed(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
+    pub fn uninit(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Self {
-            prev: vec![0; HEIGHT * WIDTH],
-            prev_state: ObjectState::default(),
-            current: vec![0; HEIGHT * WIDTH],
-            current_state: ObjectState::default(),
+            state: ObjectState::default(),
             pixels,
         }
     }
 
-    // Initialize frame state assuming zeroed buffers and render frame
+    // Initialize frame state assuming zeroed buffer and render frame
 
     pub fn init_state(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
-        // Set internal frame states
-
-        self.prev_state.set_state(ball, left_paddle, right_paddle);
-        Self::draw_internal_state(&mut self.prev, self.prev_state, COLOR);
-        self.current_state
-            .set_state(ball, left_paddle, right_paddle);
-        Self::draw_internal_state(&mut self.current, self.current_state, COLOR);
-
-        // Set display frame state and render frame
-
+        self.state.set_state(ball, left_paddle, right_paddle);
         if let Some(pixels) = &self.pixels {
             let mut pixels = pixels.lock().unwrap();
-            Self::draw_display_state(pixels.frame_mut(), self.current_state, COLOR);
+            Self::draw_state(pixels.frame_mut(), self.state, COLOR);
             pixels.render().expect("Error rendering frame");
         }
     }
@@ -76,74 +64,39 @@ impl Frame {
     // Update game state with object positions and rerender
 
     pub fn update(&mut self, ball: FloatPoint, left_paddle: Point, right_paddle: Point) {
-        // Apply previous changes to previous state
-
-        Self::draw_internal_state(&mut self.prev, self.prev_state, 0x00);
-        Self::draw_internal_state(&mut self.prev, self.current_state, COLOR);
-        self.prev_state = self.current_state;
-
-        // Apply changes to current state
-
-        self.current_state
-            .set_state(ball, left_paddle, right_paddle);
-        Self::draw_internal_state(&mut self.current, self.prev_state, 0x00);
-        Self::draw_internal_state(&mut self.current, self.current_state, COLOR);
-
-        // Render updated state
-
         if let Some(pixels) = &self.pixels {
             let mut pixels = pixels.lock().unwrap();
-            Self::draw_display_state(pixels.frame_mut(), self.prev_state, 0x00);
-            Self::draw_display_state(pixels.frame_mut(), self.current_state, COLOR);
+            Self::draw_state(pixels.frame_mut(), self.state, 0x00);
+            self.state.set_state(ball, left_paddle, right_paddle);
+            Self::draw_state(pixels.frame_mut(), self.state, COLOR);
             pixels.render().expect("Error rendering frame");
+        } else {
+            self.state.set_state(ball, left_paddle, right_paddle);
         }
     }
 
-    // Reset game state and clear buffers without rerender
+    // Reset game state and clear buffer without rerender
 
     pub fn reset(&mut self) {
-        // Clear internal frames
-
-        Self::draw_internal_state(&mut self.prev, self.prev_state, 0x00);
-        self.prev_state = ObjectState::default();
-        Self::draw_internal_state(&mut self.current, self.current_state, 0x00);
-
-        // Clear display frame
-
         if let Some(pixels) = &self.pixels {
             let mut pixels = pixels.lock().unwrap();
-            Self::draw_display_state(pixels.frame_mut(), self.current_state, COLOR);
+            Self::draw_state(pixels.frame_mut(), self.state, 0x00);
         }
-
-        self.current_state = ObjectState::default();
-    }
-
-    // Batch draw object state on internal frame
-
-    fn draw_internal_state(frame: &mut [u8], state: ObjectState, color: u8) {
-        render::draw_ball_internal(frame, state.ball, color);
-        render::draw_internal(frame, state.left_paddle, PADDLE_WIDTH, PADDLE_HEIGHT, color);
-        render::draw_internal(
-            frame,
-            state.right_paddle,
-            PADDLE_WIDTH,
-            PADDLE_HEIGHT,
-            color,
-        );
+        self.state = ObjectState::default();
     }
 
     // Batch draw object state on Pixels RGBA frame
 
-    fn draw_display_state(rgba_frame: &mut [u8], state: ObjectState, color: u8) {
-        render::draw_ball_display(rgba_frame, state.ball, color);
-        render::draw_display(
+    fn draw_state(rgba_frame: &mut [u8], state: ObjectState, color: u8) {
+        render::draw_ball(rgba_frame, state.ball, color);
+        render::draw_rect(
             rgba_frame,
             state.left_paddle,
             PADDLE_WIDTH,
             PADDLE_HEIGHT,
             color,
         );
-        render::draw_display(
+        render::draw_rect(
             rgba_frame,
             state.right_paddle,
             PADDLE_WIDTH,

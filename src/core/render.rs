@@ -56,5 +56,53 @@ pub fn draw_display(rgba_frame: &mut [u8], pos: Point, width: usize, height: usi
 
 fn calc_ball_pixels(pos: FloatPoint, color: u8) -> (Point, [[u8; BALL_SIZE + 1]; BALL_SIZE + 1]) {
     let start_pos = Point(pos.0.floor() as usize, pos.1.floor() as usize);
-    (start_pos, [[color; BALL_SIZE + 1]; BALL_SIZE + 1])
+    let mut ball_pixels = [[0x00; BALL_SIZE + 1]; BALL_SIZE + 1];
+    if color == 0x00 {
+        return (start_pos, ball_pixels);
+    }
+
+    let left_bound = pos.0;
+    let right_bound = pos.0 + (BALL_SIZE - 1) as f64;
+    let top_bound = pos.1;
+    let bottom_bound = pos.1 + (BALL_SIZE - 1) as f64;
+
+    for row in 0..BALL_SIZE + 1 {
+        for col in 0..BALL_SIZE + 1 {
+            // Calculate intersect area for color intensity
+
+            let x = (start_pos.0 + col) as f64;
+            let width = if x < left_bound {
+                1.0 - (left_bound - x)
+            } else if x > right_bound {
+                1.0 - (x - right_bound)
+            } else {
+                1.0
+            };
+
+            let y = (start_pos.1 + row) as f64;
+            let height = if y < top_bound {
+                1.0 - (top_bound - y)
+            } else if y > bottom_bound {
+                1.0 - (y - bottom_bound)
+            } else {
+                1.0
+            };
+
+            let square_color = (width * height * color as f64).round() as u8;
+            let square_color = if square_color >= 204 {
+                square_color
+            } else {
+                204 - (204 - square_color) / 2
+            };
+
+            const MIN_COLOR: u8 = 128;
+            ball_pixels[row][col] = if square_color >= MIN_COLOR {
+                square_color
+            } else {
+                0x00
+            };
+        }
+    }
+
+    (start_pos, ball_pixels)
 }

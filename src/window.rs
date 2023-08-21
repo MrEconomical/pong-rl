@@ -12,17 +12,17 @@ use winit::event_loop::{ControlFlow, EventLoopBuilder};
 use winit::platform::windows::EventLoopBuilderExtWindows;
 use winit::window::WindowBuilder;
 
-// Window event enum
+// Window event
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum UserEvent {
     GameInput(PaddleInput),
     Exit,
 }
 
-// Paddle input enum
+// Paddle input
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum PaddleInput {
     Up,
     StopUp,
@@ -134,7 +134,7 @@ fn handle_events(
             match key {
                 VirtualKeyCode::W | VirtualKeyCode::Up => {
                     event_sender
-                        .send(if action_type == ElementState::Pressed {
+                        .send(if matches!(action_type, ElementState::Pressed) {
                             UserEvent::GameInput(PaddleInput::Up)
                         } else {
                             UserEvent::GameInput(PaddleInput::StopUp)
@@ -144,7 +144,7 @@ fn handle_events(
                 }
                 VirtualKeyCode::S | VirtualKeyCode::Down => {
                     event_sender
-                        .send(if action_type == ElementState::Pressed {
+                        .send(if matches!(action_type, ElementState::Pressed) {
                             UserEvent::GameInput(PaddleInput::Down)
                         } else {
                             UserEvent::GameInput(PaddleInput::StopDown)

@@ -11,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use pixels::Pixels;
 use rand::Rng;
 
-// Ball velocity struct
+// Ball velocity
 
 #[derive(Clone, Copy)]
 struct Velocity {
@@ -19,15 +19,15 @@ struct Velocity {
     y: f64,
 }
 
-// Paddle movement input direction enum
+// Paddle movement input direction
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum PaddleMove {
     Up,
     Down,
 }
 
-// User game result enum
+// User game result
 
 #[derive(Clone, Copy)]
 pub enum GameResult {
@@ -35,7 +35,7 @@ pub enum GameResult {
     Lose,
 }
 
-// Core Pong game struct
+// Core Pong game
 
 pub struct Pong {
     ball: FloatPoint,
@@ -72,6 +72,8 @@ impl Pong {
     pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
         assert!(!self.ended, "cannot run tick after game end");
 
+        //println!("got paddle move {input:?}");
+
         // Update ball position
 
         let game_result = self.move_ball(FloatPoint(
@@ -84,7 +86,7 @@ impl Pong {
         self.frame
             .update(self.ball, self.left_paddle, self.right_paddle);
 
-        if let Some(_) = game_result {
+        if game_result.is_some() {
             self.ended = true;
         }
         game_result
@@ -104,8 +106,6 @@ impl Pong {
     // Move ball with collision detection and return if game ended
 
     fn move_ball(&mut self, to: FloatPoint) -> Option<GameResult> {
-        println!("moving ball to {} {}", to.0, to.1);
-
         // Check for top or bottom wall collision
 
         if to.1 < 0.0 {
@@ -131,6 +131,13 @@ impl Pong {
                 (HEIGHT - BALL_SIZE) as f64 - extra_dy,
             ));
         }
+
+        // Check for paddle collision
+
+        const LEFT_BOUND: f64 = (PADDLE_OFFSET + PADDLE_WIDTH) as f64;
+        const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
+
+        if to.0 <= LEFT_BOUND {}
 
         self.ball = to;
         None

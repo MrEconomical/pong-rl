@@ -2,7 +2,7 @@ use crate::core::Pong;
 
 use pyo3::{pyclass, pymethods};
 
-// Python-controlled Pong environment struct
+// Python-controlled Pong environment
 
 #[pyclass]
 pub struct PongEnv {}

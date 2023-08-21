@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 
 use pixels::Pixels;
 
-// Frame coordinate position structs
+// Frame coordinate position
 
 #[derive(Clone, Copy, Default)]
 pub struct Point(pub usize, pub usize);
@@ -12,7 +12,7 @@ pub struct Point(pub usize, pub usize);
 #[derive(Clone, Copy, Default)]
 pub struct FloatPoint(pub f64, pub f64);
 
-// Game object position struct
+// Game object position
 
 #[derive(Clone, Copy, Default)]
 struct ObjectState {
@@ -33,7 +33,7 @@ impl ObjectState {
     }
 }
 
-// Pong game display frame struct
+// Pong game display frame
 
 pub struct Frame {
     state: ObjectState,

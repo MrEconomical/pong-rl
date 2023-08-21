@@ -13,8 +13,16 @@ fn main() {
     'reset: loop {
         // Initialize game and pause
 
-        pong.start();
+        let exited = pong.start();
+        if exited {
+            break;
+        }
+
         thread::sleep(Duration::from_millis(2000));
+        let exited = pong.process_events();
+        if exited {
+            break;
+        }
 
         loop {
             // Run game tick

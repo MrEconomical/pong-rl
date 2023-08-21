@@ -5,7 +5,7 @@ pub const HEIGHT: usize = 480;
 pub const RESCALE: usize = 4;
 pub const FRAME_DELAY: u64 = 33;
 
-pub const BALL_SIZE: usize = 10;
+pub const BALL_SIZE: usize = 14;
 pub const BALL_SPEED: f64 = 14.0;
 pub const MAX_BALL_ANGLE: f64 = 75.0;
 pub const MAX_INITIAL_ANGLE: f64 = 45.0;

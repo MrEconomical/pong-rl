@@ -105,6 +105,33 @@ impl Pong {
 
     fn move_ball(&mut self, to: FloatPoint) -> Option<GameResult> {
         println!("moving ball to {} {}", to.0, to.1);
+
+        // Check for top or bottom wall collision
+
+        if to.1 < 0.0 {
+            let bounce_dx = self.ball_velocity.x * (to.1 / self.ball_velocity.y);
+            let remaining_dx = self.ball_velocity.x - bounce_dx;
+
+            self.ball.0 += bounce_dx;
+            self.ball.1 = 0.0;
+            self.ball_velocity.y *= -1.0;
+
+            return self.move_ball(FloatPoint(self.ball.0 + remaining_dx, -to.1));
+        } else if to.1 >= (HEIGHT - BALL_SIZE) as f64 {
+            let extra_dy = to.1 - (HEIGHT - BALL_SIZE) as f64;
+            let bounce_dx = self.ball_velocity.x * (extra_dy / self.ball_velocity.y);
+            let remaining_dx = self.ball_velocity.x - bounce_dx;
+
+            self.ball.0 += bounce_dx;
+            self.ball.1 = (HEIGHT - BALL_SIZE) as f64;
+            self.ball_velocity.y *= -1.0;
+
+            return self.move_ball(FloatPoint(
+                self.ball.0 + remaining_dx,
+                (HEIGHT - BALL_SIZE) as f64 - extra_dy,
+            ));
+        }
+
         self.ball = to;
         None
     }

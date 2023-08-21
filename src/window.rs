@@ -100,7 +100,7 @@ fn handle_events(
 ) {
     // Render on redraw requested
 
-    if let Event::RedrawRequested(_) = event {
+    if matches!(event, Event::RedrawRequested(_)) {
         if let Err(error) = pixels.lock().unwrap().render() {
             eprintln!("Error rendering on redraw: {error}");
             let _ = event_sender.send(UserEvent::Exit);

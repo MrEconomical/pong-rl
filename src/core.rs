@@ -72,7 +72,7 @@ impl Pong {
     pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
         assert!(!self.ended, "cannot run tick after game end");
 
-        //println!("got paddle move {input:?}");
+        println!("got paddle move {input:?}");
 
         // Update ball position
 

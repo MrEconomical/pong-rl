@@ -67,10 +67,41 @@ impl PongGame {
             match event {
                 UserEvent::GameInput(paddle_input) => match paddle_input {
                     PaddleInput::Up => {
-                        self.active_moves.up = false;
-                        if matches!(self.selected_move, Some(PaddleMove::Up)) {}
+                        // Set paddle direction to up
+
+                        self.active_moves.up = true;
+                        self.selected_move = Some(PaddleMove::Up);
                     }
-                    _ => (),
+                    PaddleInput::StopUp => {
+                        // Set paddle direction to down or none
+
+                        self.active_moves.up = false;
+                        if matches!(self.selected_move, Some(PaddleMove::Up)) {
+                            self.selected_move = if self.active_moves.down {
+                                Some(PaddleMove::Down)
+                            } else {
+                                None
+                            }
+                        }
+                    }
+                    PaddleInput::Down => {
+                        // Set paddle direction to down
+
+                        self.active_moves.down = true;
+                        self.selected_move = Some(PaddleMove::Down)
+                    }
+                    PaddleInput::StopDown => {
+                        // Set paddle direction to up or none
+
+                        self.active_moves.down = false;
+                        if matches!(self.selected_move, Some(PaddleMove::Down)) {
+                            self.selected_move = if self.active_moves.up {
+                                Some(PaddleMove::Up)
+                            } else {
+                                None
+                            }
+                        }
+                    }
                 },
                 UserEvent::Exit => return true,
             }

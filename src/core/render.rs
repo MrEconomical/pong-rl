@@ -6,9 +6,12 @@ use crate::config::{BALL_SIZE, BORDER, COLOR, HEIGHT, TOTAL_HEIGHT, TOTAL_WIDTH}
 pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
     let (start_pos, ball_pixels) = calc_ball_pixels(pos, color);
     for row in 0..BALL_SIZE + 1 {
+        let row_offset = start_pos.1 + row + BORDER;
+        if row_offset == TOTAL_HEIGHT - BORDER {
+            continue;
+        }
         for col in 0..BALL_SIZE + 1 {
-            let offset =
-                ((start_pos.1 + row + BORDER) * TOTAL_WIDTH + start_pos.0 + col + BORDER) * 4;
+            let offset = (row_offset * TOTAL_WIDTH + start_pos.0 + col + BORDER) * 4;
             set_rgba_color(rgba_frame, offset, ball_pixels[row][col]);
         }
     }

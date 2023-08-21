@@ -93,6 +93,26 @@ impl Pong {
             }
         }
 
+        // Update bot paddle position
+
+        let bot_middle = self.right_paddle.1 + PADDLE_HEIGHT / 2;
+        let ball_middle = self.ball.1.round() as usize + BALL_SIZE / 2;
+        if ball_middle.abs_diff(bot_middle) >= PADDLE_SPEED {
+            if ball_middle < bot_middle {
+                if self.right_paddle.1 <= PADDLE_SPEED {
+                    self.right_paddle.1 = 0;
+                } else {
+                    self.right_paddle.1 -= PADDLE_SPEED;
+                }
+            } else if ball_middle > bot_middle {
+                if self.right_paddle.1 >= HEIGHT - PADDLE_HEIGHT - PADDLE_SPEED {
+                    self.right_paddle.1 = HEIGHT - PADDLE_HEIGHT;
+                } else {
+                    self.right_paddle.1 += PADDLE_SPEED;
+                }
+            }
+        }
+
         // Update ball position
 
         let game_result = self.move_ball(FloatPoint(

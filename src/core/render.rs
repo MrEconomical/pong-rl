@@ -1,5 +1,5 @@
 use super::frame::{FloatPoint, Point};
-use crate::config::{BALL_SIZE, COLOR, WIDTH};
+use crate::config::{BALL_SIZE, BORDER, COLOR, HEIGHT, TOTAL_HEIGHT, TOTAL_WIDTH};
 
 // Draw ball on Pixels RGBA frame at position with subpixel rendering
 
@@ -7,11 +7,9 @@ pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
     let (start_pos, ball_pixels) = calc_ball_pixels(pos, color);
     for row in 0..BALL_SIZE + 1 {
         for col in 0..BALL_SIZE + 1 {
-            let offset = ((start_pos.1 + row) * WIDTH + start_pos.0 + col) * 4;
-            rgba_frame[offset] = ball_pixels[row][col];
-            rgba_frame[offset + 1] = ball_pixels[row][col];
-            rgba_frame[offset + 2] = ball_pixels[row][col];
-            rgba_frame[offset + 3] = 0xFF;
+            let offset =
+                ((start_pos.1 + row + BORDER) * TOTAL_WIDTH + start_pos.0 + col + BORDER) * 4;
+            set_rgba_color(rgba_frame, offset, ball_pixels[row][col]);
         }
     }
 }
@@ -21,11 +19,30 @@ pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
 pub fn draw_rect(rgba_frame: &mut [u8], pos: Point, width: usize, height: usize, color: u8) {
     for row in pos.1..pos.1 + height {
         for col in pos.0..pos.0 + width {
-            let offset = (row * WIDTH + col) * 4;
-            rgba_frame[offset] = color;
-            rgba_frame[offset + 1] = color;
-            rgba_frame[offset + 2] = color;
-            rgba_frame[offset + 3] = 0xFF;
+            let offset = ((row + BORDER) * TOTAL_WIDTH + col + BORDER) * 4;
+            set_rgba_color(rgba_frame, offset, color);
+        }
+    }
+}
+
+// Draw border on Pixels RGBA frame
+
+pub fn draw_border(rgba_frame: &mut [u8]) {
+    for row in 0..BORDER {
+        for col in 0..TOTAL_WIDTH {
+            let offset_top = (row * TOTAL_WIDTH + col) * 4;
+            set_rgba_color(rgba_frame, offset_top, COLOR);
+            let offset_bottom = ((TOTAL_HEIGHT - row - 1) * TOTAL_WIDTH + col) * 4;
+            set_rgba_color(rgba_frame, offset_bottom, COLOR);
+        }
+    }
+
+    for col in 0..BORDER {
+        for row in 0..HEIGHT {
+            let offset_left = ((row + BORDER) * TOTAL_WIDTH + col) * 4;
+            set_rgba_color(rgba_frame, offset_left, COLOR);
+            let offset_right = ((row + BORDER) * TOTAL_WIDTH + TOTAL_WIDTH - col - 1) * 4;
+            set_rgba_color(rgba_frame, offset_right, COLOR);
         }
     }
 }
@@ -79,4 +96,13 @@ fn calc_ball_pixels(pos: FloatPoint, color: u8) -> (Point, [[u8; BALL_SIZE + 1];
     }
 
     (start_pos, ball_pixels)
+}
+
+// Set RGBA color at offset in frame with zero transparency
+
+fn set_rgba_color(frame: &mut [u8], offset: usize, color: u8) {
+    frame[offset] = color;
+    frame[offset + 1] = color;
+    frame[offset + 2] = color;
+    frame[offset + 3] = 0xFF;
 }

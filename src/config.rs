@@ -17,3 +17,6 @@ pub const PADDLE_OFFSET: usize = 10;
 
 pub const COLOR: u8 = 0xFF;
 pub const WINDOW_SCALE: usize = 1;
+pub const BORDER: usize = 1;
+pub const TOTAL_WIDTH: usize = WIDTH + BORDER * 2;
+pub const TOTAL_HEIGHT: usize = HEIGHT + BORDER * 2;

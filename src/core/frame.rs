@@ -44,6 +44,9 @@ impl Frame {
     // Create empty frame with optional Pixels display
 
     pub fn uninit(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
+        if let Some(pixels) = &pixels {
+            render::draw_border(pixels.lock().unwrap().frame_mut());
+        }
         Self {
             state: ObjectState::default(),
             pixels,

@@ -60,50 +60,52 @@ impl PongGame {
         false
     }
 
-    // Process channel events and return if the user exited
+    // Process channel event buffer and return if the user exited
 
     pub fn process_events(&mut self) -> bool {
         while let Ok(event) = self.event_channel.try_recv() {
-            match event {
-                UserEvent::GameInput(paddle_input) => match paddle_input {
-                    PaddleInput::Up => {
-                        // Set paddle direction to up
-
-                        self.active_moves.up = true;
-                        self.selected_move = Some(PaddleMove::Up);
-                    }
-                    PaddleInput::StopUp => {
-                        // Set paddle direction to down or none
-
-                        self.active_moves.up = false;
-                        if matches!(self.selected_move, Some(PaddleMove::Up)) {
-                            self.selected_move = if self.active_moves.down {
-                                Some(PaddleMove::Down)
-                            } else {
-                                None
-                            }
-                        }
-                    }
-                    PaddleInput::Down => {
-                        // Set paddle direction to down
-
-                        self.active_moves.down = true;
-                        self.selected_move = Some(PaddleMove::Down)
-                    }
-                    PaddleInput::StopDown => {
-                        // Set paddle direction to up or none
-
-                        self.active_moves.down = false;
-                        if matches!(self.selected_move, Some(PaddleMove::Down)) {
-                            self.selected_move = if self.active_moves.up {
-                                Some(PaddleMove::Up)
-                            } else {
-                                None
-                            }
-                        }
-                    }
-                },
+            let paddle_input = match event {
+                UserEvent::GameInput(paddle_input) => paddle_input,
                 UserEvent::Exit => return true,
+            };
+
+            match paddle_input {
+                PaddleInput::Up => {
+                    // Set paddle direction to up
+
+                    self.active_moves.up = true;
+                    self.selected_move = Some(PaddleMove::Up);
+                }
+                PaddleInput::StopUp => {
+                    // Set paddle direction to down or none
+
+                    self.active_moves.up = false;
+                    if matches!(self.selected_move, Some(PaddleMove::Up)) {
+                        self.selected_move = if self.active_moves.down {
+                            Some(PaddleMove::Down)
+                        } else {
+                            None
+                        }
+                    }
+                }
+                PaddleInput::Down => {
+                    // Set paddle direction to down
+
+                    self.active_moves.down = true;
+                    self.selected_move = Some(PaddleMove::Down)
+                }
+                PaddleInput::StopDown => {
+                    // Set paddle direction to up or none
+
+                    self.active_moves.down = false;
+                    if matches!(self.selected_move, Some(PaddleMove::Down)) {
+                        self.selected_move = if self.active_moves.up {
+                            Some(PaddleMove::Up)
+                        } else {
+                            None
+                        }
+                    }
+                }
             }
         }
         return false;

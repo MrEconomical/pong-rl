@@ -18,7 +18,7 @@ fn main() {
             break;
         }
 
-        thread::sleep(Duration::from_millis(2000));
+        thread::sleep(Duration::from_millis(1500));
         let exited = pong.process_events();
         if exited {
             break;
@@ -30,7 +30,7 @@ fn main() {
             let tick_result = pong.tick();
             match tick_result {
                 Some(TickResult::GameEnd) => {
-                    thread::sleep(Duration::from_millis(2000));
+                    thread::sleep(Duration::from_millis(1500));
                     pong.reset();
                     break;
                 }

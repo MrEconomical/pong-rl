@@ -31,6 +31,7 @@ fn main() {
             match tick_result {
                 Some(TickResult::GameEnd) => {
                     thread::sleep(Duration::from_millis(2000));
+                    pong.reset();
                     break;
                 }
                 Some(TickResult::Exit) => break 'reset,

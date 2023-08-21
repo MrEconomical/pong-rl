@@ -178,6 +178,16 @@ impl Pong {
 
         if to.0 <= LEFT_BOUND {}
 
+        // Check for left or right wall collision ending game
+
+        if to.0 <= 0.0 {
+            return Some(GameResult::Lose);
+        } else if to.0 >= (WIDTH - BALL_SIZE) as f64 {
+            return Some(GameResult::Win);
+        }
+
+        // No obstructions
+
         self.ball = to;
         None
     }

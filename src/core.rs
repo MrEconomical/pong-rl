@@ -72,7 +72,26 @@ impl Pong {
     pub fn tick(&mut self, input: Option<PaddleMove>) -> Option<GameResult> {
         assert!(!self.ended, "cannot run tick after game end");
 
-        println!("got paddle move {input:?}");
+        // Update player paddle position
+
+        if let Some(paddle_move) = input {
+            match paddle_move {
+                PaddleMove::Up => {
+                    if self.left_paddle.1 <= PADDLE_SPEED {
+                        self.left_paddle.1 = 0;
+                    } else {
+                        self.left_paddle.1 -= PADDLE_SPEED;
+                    }
+                }
+                PaddleMove::Down => {
+                    if self.left_paddle.1 >= HEIGHT - PADDLE_HEIGHT - PADDLE_SPEED {
+                        self.left_paddle.1 = HEIGHT - PADDLE_HEIGHT;
+                    } else {
+                        self.left_paddle.1 += PADDLE_SPEED;
+                    }
+                }
+            }
+        }
 
         // Update ball position
 

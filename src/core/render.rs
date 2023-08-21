@@ -68,15 +68,8 @@ fn calc_ball_pixels(pos: FloatPoint, color: u8) -> (Point, [[u8; BALL_SIZE + 1];
 
             // Scale color intensity and discard dim colors
 
-            const CUTOFF: u8 = (COLOR as f64 * 0.8) as u8;
-            let square_color = (width * height * color as f64).round() as u8;
-            let square_color = if square_color >= CUTOFF {
-                square_color
-            } else {
-                CUTOFF - (CUTOFF - square_color) / 2
-            };
-
             const MIN_COLOR: u8 = COLOR / 2;
+            let square_color = (width * height * color as f64).round() as u8;
             ball_pixels[row][col] = if square_color >= MIN_COLOR {
                 square_color
             } else {

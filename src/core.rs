@@ -97,6 +97,7 @@ impl Pong {
 
         let bot_middle = self.right_paddle.1 + PADDLE_HEIGHT / 2;
         let ball_middle = self.ball.1.round() as usize + BALL_SIZE / 2;
+        #[allow(clippy::comparison_chain)]
         if ball_middle.abs_diff(bot_middle) >= PADDLE_SPEED {
             if ball_middle < bot_middle {
                 if self.right_paddle.1 <= PADDLE_SPEED {
@@ -279,7 +280,7 @@ impl Pong {
         } else {
             real_offset.powf(ANGLE_SCALE)
         };
-        return scale_factor * MAX_BOUNCE_ANGLE;
+        scale_factor * MAX_BOUNCE_ANGLE
     }
 
     // Return initial game values

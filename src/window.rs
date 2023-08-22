@@ -140,7 +140,6 @@ fn handle_events(
                             UserEvent::GameInput(PaddleInput::StopUp)
                         })
                         .unwrap();
-                    return;
                 }
                 VirtualKeyCode::S | VirtualKeyCode::Down => {
                     event_sender
@@ -150,7 +149,6 @@ fn handle_events(
                             UserEvent::GameInput(PaddleInput::StopDown)
                         })
                         .unwrap();
-                    return;
                 }
                 _ => (),
             }
@@ -166,7 +164,6 @@ fn handle_events(
                 eprintln!("Error rendering on resize: {error}");
                 let _ = event_sender.send(UserEvent::Exit);
                 *control_flow = ControlFlow::Exit;
-                return;
             }
         }
         WindowEvent::CloseRequested | WindowEvent::Destroyed => {
@@ -174,7 +171,6 @@ fn handle_events(
 
             event_sender.send(UserEvent::Exit).unwrap();
             *control_flow = ControlFlow::Exit;
-            return;
         }
         _ => (),
     }

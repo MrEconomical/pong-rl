@@ -5,6 +5,7 @@ use crate::config::{BALL_SIZE, BORDER, COLOR, HEIGHT, TOTAL_HEIGHT, TOTAL_WIDTH}
 
 pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
     let (start_pos, ball_pixels) = calc_ball_pixels(pos, color);
+    #[allow(clippy::needless_range_loop)]
     for row in 0..BALL_SIZE + 1 {
         let row_offset = start_pos.1 + row + BORDER;
         if row_offset == TOTAL_HEIGHT - BORDER {
@@ -64,6 +65,7 @@ fn calc_ball_pixels(pos: FloatPoint, color: u8) -> (Point, [[u8; BALL_SIZE + 1];
     let top_bound = pos.1;
     let bottom_bound = pos.1 + (BALL_SIZE - 1) as f64;
 
+    #[allow(clippy::needless_range_loop)]
     for row in 0..BALL_SIZE + 1 {
         for col in 0..BALL_SIZE + 1 {
             // Calculate intersect area for color intensity

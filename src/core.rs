@@ -2,8 +2,8 @@ mod frame;
 mod render;
 
 use crate::config::{
-    BALL_SIZE, BALL_SPEED, HEIGHT, MAX_BALL_ANGLE, MAX_INITIAL_ANGLE, PADDLE_HEIGHT, PADDLE_OFFSET,
-    PADDLE_SPEED, PADDLE_WIDTH, WIDTH,
+    BALL_SIZE, BALL_SPEED, HEIGHT, MAX_BOUNCE_ANGLE, MAX_INITIAL_ANGLE, PADDLE_HEIGHT,
+    PADDLE_OFFSET, PADDLE_SPEED, PADDLE_WIDTH, WIDTH,
 };
 use frame::{FloatPoint, Frame, Point};
 use std::sync::{Arc, Mutex};
@@ -209,14 +209,38 @@ impl Pong {
         const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
         let prev_x = to.0 - self.ball_velocity.x;
 
-        if to.0 <= LEFT_BOUND && prev_x >= LEFT_BOUND {
-            println!("could have collided with first paddle");
+        if to.0 <= LEFT_BOUND
+            && prev_x >= LEFT_BOUND
+            && to.1 > self.left_paddle.1 as f64 - BALL_SIZE as f64
+            && to.1 < self.left_paddle.1 as f64 + PADDLE_HEIGHT as f64
+        {
+            // Move ball against left paddle
+
+            let extra_dx = LEFT_BOUND - to.0;
+            let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
+            let remaining = 1.0 - (extra_dx / self.ball_velocity.x);
+
+            self.ball.0 = LEFT_BOUND;
+            self.ball.1 += bounce_dy;
+
+            // Change ball velocity based on bounce position
+
+            let angle = Self::calc_bounce_angle(self.ball.1, self.right_paddle.1);
+            self.ball_velocity.x = BALL_SPEED * angle.to_radians().cos();
+            self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
+
+            // Add remaining fractional distance based on new velocity
+
+            return Some(self.move_ball(FloatPoint(
+                self.ball.0 + self.ball_velocity.x * remaining,
+                self.ball.1 + self.ball_velocity.y * remaining,
+            )));
         } else if to.0 >= RIGHT_BOUND
             && prev_x <= RIGHT_BOUND
-            && to.1 > (self.right_paddle.1 - BALL_SIZE) as f64
-            && to.1 < (self.right_paddle.1 + PADDLE_HEIGHT) as f64
+            && to.1 > self.right_paddle.1 as f64 - BALL_SIZE as f64
+            && to.1 < self.right_paddle.1 as f64 + PADDLE_HEIGHT as f64
         {
-            // Move ball against paddle
+            // Move ball against right paddle
 
             let extra_dx = to.0 - RIGHT_BOUND;
             let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
@@ -227,9 +251,7 @@ impl Pong {
 
             // Change ball velocity based on bounce position
 
-            let ball_center = self.ball.1 + BALL_SIZE as f64 / 2.0;
-            let paddle_center = self.right_paddle.1 as f64 + PADDLE_HEIGHT as f64 / 2.0;
-            let angle = Self::calc_bounce_angle(ball_center, paddle_center);
+            let angle = Self::calc_bounce_angle(self.ball.1, self.right_paddle.1);
             self.ball_velocity.x = -BALL_SPEED * angle.to_radians().cos();
             self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
 
@@ -246,8 +268,11 @@ impl Pong {
 
     // Calculate ball bounce angle off paddle
 
-    fn calc_bounce_angle(ball_pos: f64, paddle_pos: f64) -> f64 {
-        45.0
+    fn calc_bounce_angle(ball_y: f64, paddle_y: usize) -> f64 {
+        let ball_center = ball_y + BALL_SIZE as f64 / 2.0;
+        let paddle_center = paddle_y as f64 + PADDLE_HEIGHT as f64 / 2.0;
+        let real_offset = 2.0 * (ball_center - paddle_center) / PADDLE_HEIGHT as f64;
+        return real_offset.sqrt() * MAX_BOUNCE_ANGLE;
     }
 
     // Return initial game values

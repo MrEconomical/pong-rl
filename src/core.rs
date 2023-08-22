@@ -151,8 +151,9 @@ impl Pong {
         if let Some(wall_collision) = self.check_wall_collision(to) {
             return wall_collision;
         }
-        if let Some(paddle_collision) = self.check_paddle_collision(to) {
-            return paddle_collision;
+        let paddle_collision = self.check_paddle_collision(to);
+        if paddle_collision {
+            return None;
         }
 
         // Check for left or right wall collision ending game
@@ -205,7 +206,7 @@ impl Pong {
 
     // Check for left or right paddle collision when moving ball
 
-    fn check_paddle_collision(&mut self, to: FloatPoint) -> Option<Option<GameResult>> {
+    fn check_paddle_collision(&mut self, to: FloatPoint) -> bool {
         const LEFT_BOUND: f64 = (PADDLE_OFFSET + PADDLE_WIDTH) as f64;
         const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
         let prev_x = to.0 - self.ball_velocity.x;
@@ -219,8 +220,6 @@ impl Pong {
 
             let extra_dx = LEFT_BOUND - to.0;
             let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
-            let remaining = 1.0 - (extra_dx / self.ball_velocity.x);
-
             self.ball.0 = LEFT_BOUND;
             self.ball.1 += bounce_dy;
 
@@ -230,12 +229,7 @@ impl Pong {
             self.ball_velocity.x = BALL_SPEED * angle.to_radians().cos();
             self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
 
-            // Add remaining fractional distance based on new velocity
-
-            return Some(self.move_ball(FloatPoint(
-                self.ball.0 + self.ball_velocity.x * remaining,
-                self.ball.1 + self.ball_velocity.y * remaining,
-            )));
+            return true;
         } else if to.0 >= RIGHT_BOUND
             && prev_x <= RIGHT_BOUND
             && to.1 > self.right_paddle.1 as f64 - BALL_SIZE as f64
@@ -245,8 +239,6 @@ impl Pong {
 
             let extra_dx = to.0 - RIGHT_BOUND;
             let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
-            let remaining = 1.0 - (extra_dx / self.ball_velocity.x);
-
             self.ball.0 = RIGHT_BOUND;
             self.ball.1 += bounce_dy;
 
@@ -256,15 +248,10 @@ impl Pong {
             self.ball_velocity.x = -BALL_SPEED * angle.to_radians().cos();
             self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
 
-            // Add remaining fractional distance based on new velocity
-
-            return Some(self.move_ball(FloatPoint(
-                self.ball.0 + self.ball_velocity.x * remaining,
-                self.ball.1 + self.ball_velocity.y * remaining,
-            )));
+            return true;
         }
 
-        None
+        false
     }
 
     // Calculate ball bounce angle off paddle

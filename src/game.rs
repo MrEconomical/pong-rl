@@ -106,6 +106,7 @@ impl PongGame {
                 }
             }
         }
+
         false
     }
 

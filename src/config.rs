@@ -8,7 +8,7 @@ pub const FRAME_DELAY: u64 = 15;
 pub const BALL_SIZE: usize = 14;
 pub const BALL_SPEED: f64 = 12.0;
 pub const MAX_BOUNCE_ANGLE: f64 = 65.0;
-pub const MAX_INITIAL_ANGLE: f64 = 45.0;
+pub const MAX_INITIAL_ANGLE: f64 = 40.0;
 
 pub const PADDLE_WIDTH: usize = 10;
 pub const PADDLE_HEIGHT: usize = 80;

@@ -273,10 +273,11 @@ impl Pong {
         let paddle_center = paddle_y as f64 + PADDLE_HEIGHT as f64 / 2.0;
         let real_offset = 2.0 * (ball_center - paddle_center) / PADDLE_HEIGHT as f64;
 
+        const ANGLE_SCALE: f64 = 0.75;
         let scale_factor = if real_offset < 0.0 {
-            -(-real_offset).sqrt()
+            -(-real_offset).powf(ANGLE_SCALE)
         } else {
-            real_offset.sqrt()
+            real_offset.powf(ANGLE_SCALE)
         };
         return scale_factor * MAX_BOUNCE_ANGLE;
     }

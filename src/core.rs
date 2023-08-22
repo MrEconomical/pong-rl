@@ -75,22 +75,7 @@ impl Pong {
         // Update player paddle position
 
         if let Some(paddle_move) = input {
-            match paddle_move {
-                PaddleMove::Up => {
-                    if self.left_paddle.1 <= PADDLE_SPEED {
-                        self.left_paddle.1 = 0;
-                    } else {
-                        self.left_paddle.1 -= PADDLE_SPEED;
-                    }
-                }
-                PaddleMove::Down => {
-                    if self.left_paddle.1 >= HEIGHT - PADDLE_HEIGHT - PADDLE_SPEED {
-                        self.left_paddle.1 = HEIGHT - PADDLE_HEIGHT;
-                    } else {
-                        self.left_paddle.1 += PADDLE_SPEED;
-                    }
-                }
-            }
+            Self::move_paddle(&mut self.left_paddle, paddle_move);
         }
 
         // Update bot paddle position
@@ -100,17 +85,9 @@ impl Pong {
         #[allow(clippy::comparison_chain)]
         if ball_middle.abs_diff(bot_middle) >= PADDLE_SPEED {
             if ball_middle < bot_middle {
-                if self.right_paddle.1 <= PADDLE_SPEED {
-                    self.right_paddle.1 = 0;
-                } else {
-                    self.right_paddle.1 -= PADDLE_SPEED;
-                }
+                Self::move_paddle(&mut self.right_paddle, PaddleMove::Up);
             } else if ball_middle > bot_middle {
-                if self.right_paddle.1 >= HEIGHT - PADDLE_HEIGHT - PADDLE_SPEED {
-                    self.right_paddle.1 = HEIGHT - PADDLE_HEIGHT;
-                } else {
-                    self.right_paddle.1 += PADDLE_SPEED;
-                }
+                Self::move_paddle(&mut self.right_paddle, PaddleMove::Down);
             }
         }
 
@@ -168,6 +145,27 @@ impl Pong {
 
         self.ball = to;
         None
+    }
+
+    // Move paddle in direction considering wall bounds
+
+    fn move_paddle(paddle: &mut Point, direction: PaddleMove) {
+        match direction {
+            PaddleMove::Up => {
+                if paddle.1 <= PADDLE_SPEED {
+                    paddle.1 = 0;
+                } else {
+                    paddle.1 -= PADDLE_SPEED;
+                }
+            }
+            PaddleMove::Down => {
+                if paddle.1 >= HEIGHT - PADDLE_HEIGHT - PADDLE_SPEED {
+                    paddle.1 = HEIGHT - PADDLE_HEIGHT;
+                } else {
+                    paddle.1 += PADDLE_SPEED;
+                }
+            }
+        }
     }
 
     // Check for top or bottom wall collision when moving ball

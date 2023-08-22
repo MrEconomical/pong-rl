@@ -145,43 +145,13 @@ impl Pong {
     // Move ball with collision detection and return if game ended
 
     fn move_ball(&mut self, to: FloatPoint) -> Option<GameResult> {
-        // Check for top or bottom wall collision
+        // Check for wall and paddle collisions
 
-        if let Some(collision_result) = self.check_wall_collision(to) {
-            return Some(collision_result);
+        if let Some(wall_collision) = self.check_wall_collision(to) {
+            return wall_collision;
         }
-
-        // Check for paddle collision
-
-        const LEFT_BOUND: f64 = (PADDLE_OFFSET + PADDLE_WIDTH) as f64;
-        const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
-        let prev_x = to.0 - self.ball_velocity.x;
-
-        if to.0 <= LEFT_BOUND && prev_x >= LEFT_BOUND {
-            println!("could have collided with first paddle");
-        } else if to.0 >= RIGHT_BOUND
-            && prev_x <= RIGHT_BOUND
-            && to.1 > (self.right_paddle.1 - BALL_SIZE) as f64
-            && to.1 < (self.right_paddle.1 + PADDLE_HEIGHT) as f64
-        {
-            // Move ball against paddle
-
-            let extra_dx = to.0 - RIGHT_BOUND;
-            let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
-
-            self.ball.1 += bounce_dy;
-            self.ball.0 = RIGHT_BOUND;
-            println!("set to right bound");
-
-            // Change ball velocity based on bounce position
-
-            let ball_center = self.ball.1 + BALL_SIZE as f64 / 2.0;
-            let paddle_center = self.right_paddle.1 as f64 + PADDLE_HEIGHT as f64 / 2.0;
-            let angle = Self::calc_bounce_angle(ball_center, paddle_center);
-            self.ball_velocity.x = -BALL_SPEED * angle.to_radians().cos();
-            self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
-
-            return None;
+        if let Some(paddle_collision) = self.check_paddle_collision(to) {
+            return paddle_collision;
         }
 
         // Check for left or right wall collision ending game
@@ -200,7 +170,7 @@ impl Pong {
 
     // Check for top or bottom wall collision when moving ball
 
-    fn check_wall_collision(&mut self, to: FloatPoint) -> Option<GameResult> {
+    fn check_wall_collision(&mut self, to: FloatPoint) -> Option<Option<GameResult>> {
         if to.1 < 0.0 {
             // Move ball to top wall and then move to expected bounce point
 
@@ -211,7 +181,7 @@ impl Pong {
             self.ball.1 = 0.0;
             self.ball_velocity.y *= -1.0;
 
-            return self.move_ball(FloatPoint(self.ball.0 + remaining_dx, -to.1));
+            return Some(self.move_ball(FloatPoint(self.ball.0 + remaining_dx, -to.1)));
         } else if to.1 >= (HEIGHT - BALL_SIZE) as f64 {
             // Move ball to bottom wall and then move to expected bounce point
 
@@ -223,10 +193,52 @@ impl Pong {
             self.ball.1 = (HEIGHT - BALL_SIZE) as f64;
             self.ball_velocity.y *= -1.0;
 
-            return self.move_ball(FloatPoint(
+            return Some(self.move_ball(FloatPoint(
                 self.ball.0 + remaining_dx,
                 (HEIGHT - BALL_SIZE) as f64 - extra_dy,
-            ));
+            )));
+        }
+
+        None
+    }
+
+    // Check for left or right paddle collision when moving ball
+
+    fn check_paddle_collision(&mut self, to: FloatPoint) -> Option<Option<GameResult>> {
+        const LEFT_BOUND: f64 = (PADDLE_OFFSET + PADDLE_WIDTH) as f64;
+        const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
+        let prev_x = to.0 - self.ball_velocity.x;
+
+        if to.0 <= LEFT_BOUND && prev_x >= LEFT_BOUND {
+            println!("could have collided with first paddle");
+        } else if to.0 >= RIGHT_BOUND
+            && prev_x <= RIGHT_BOUND
+            && to.1 > (self.right_paddle.1 - BALL_SIZE) as f64
+            && to.1 < (self.right_paddle.1 + PADDLE_HEIGHT) as f64
+        {
+            // Move ball against paddle
+
+            let extra_dx = to.0 - RIGHT_BOUND;
+            let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
+            let remaining = 1.0 - (extra_dx / self.ball_velocity.x);
+
+            self.ball.0 = RIGHT_BOUND;
+            self.ball.1 += bounce_dy;
+
+            // Change ball velocity based on bounce position
+
+            let ball_center = self.ball.1 + BALL_SIZE as f64 / 2.0;
+            let paddle_center = self.right_paddle.1 as f64 + PADDLE_HEIGHT as f64 / 2.0;
+            let angle = Self::calc_bounce_angle(ball_center, paddle_center);
+            self.ball_velocity.x = -BALL_SPEED * angle.to_radians().cos();
+            self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
+
+            // Add remaining fractional distance based on new velocity
+
+            return Some(self.move_ball(FloatPoint(
+                self.ball.0 + self.ball_velocity.x * remaining,
+                self.ball.1 + self.ball_velocity.y * remaining,
+            )));
         }
 
         None

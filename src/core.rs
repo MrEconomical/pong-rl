@@ -147,7 +147,63 @@ impl Pong {
     fn move_ball(&mut self, to: FloatPoint) -> Option<GameResult> {
         // Check for top or bottom wall collision
 
+        if let Some(collision_result) = self.check_wall_collision(to) {
+            return Some(collision_result);
+        }
+
+        // Check for paddle collision
+
+        const LEFT_BOUND: f64 = (PADDLE_OFFSET + PADDLE_WIDTH) as f64;
+        const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
+        let prev_x = to.0 - self.ball_velocity.x;
+
+        if to.0 <= LEFT_BOUND && prev_x >= LEFT_BOUND {
+            println!("could have collided with first paddle");
+        } else if to.0 >= RIGHT_BOUND
+            && prev_x <= RIGHT_BOUND
+            && to.1 > (self.right_paddle.1 - BALL_SIZE) as f64
+            && to.1 < (self.right_paddle.1 + PADDLE_HEIGHT) as f64
+        {
+            // Move ball against paddle
+
+            let extra_dx = to.0 - RIGHT_BOUND;
+            let bounce_dy = self.ball_velocity.y * (extra_dx / self.ball_velocity.x);
+
+            self.ball.1 += bounce_dy;
+            self.ball.0 = RIGHT_BOUND;
+            println!("set to right bound");
+
+            // Change ball velocity based on bounce position
+
+            let ball_center = self.ball.1 + BALL_SIZE as f64 / 2.0;
+            let paddle_center = self.right_paddle.1 as f64 + PADDLE_HEIGHT as f64 / 2.0;
+            let angle = Self::calc_bounce_angle(ball_center, paddle_center);
+            self.ball_velocity.x = -BALL_SPEED * angle.to_radians().cos();
+            self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
+
+            return None;
+        }
+
+        // Check for left or right wall collision ending game
+
+        if to.0 <= 0.0 {
+            return Some(GameResult::Lose);
+        } else if to.0 >= (WIDTH - BALL_SIZE) as f64 {
+            return Some(GameResult::Win);
+        }
+
+        // No obstructions
+
+        self.ball = to;
+        None
+    }
+
+    // Check for top or bottom wall collision when moving ball
+
+    fn check_wall_collision(&mut self, to: FloatPoint) -> Option<GameResult> {
         if to.1 < 0.0 {
+            // Move ball to top wall and then move to expected bounce point
+
             let bounce_dx = self.ball_velocity.x * (to.1 / self.ball_velocity.y);
             let remaining_dx = self.ball_velocity.x - bounce_dx;
 
@@ -157,6 +213,8 @@ impl Pong {
 
             return self.move_ball(FloatPoint(self.ball.0 + remaining_dx, -to.1));
         } else if to.1 >= (HEIGHT - BALL_SIZE) as f64 {
+            // Move ball to bottom wall and then move to expected bounce point
+
             let extra_dy = to.1 - (HEIGHT - BALL_SIZE) as f64;
             let bounce_dx = self.ball_velocity.x * (extra_dy / self.ball_velocity.y);
             let remaining_dx = self.ball_velocity.x - bounce_dx;
@@ -171,25 +229,13 @@ impl Pong {
             ));
         }
 
-        // Check for paddle collision
-
-        const LEFT_BOUND: f64 = (PADDLE_OFFSET + PADDLE_WIDTH) as f64;
-        const RIGHT_BOUND: f64 = (WIDTH - PADDLE_OFFSET - PADDLE_WIDTH - BALL_SIZE) as f64;
-
-        if to.0 <= LEFT_BOUND {}
-
-        // Check for left or right wall collision ending game
-
-        if to.0 <= 0.0 {
-            return Some(GameResult::Lose);
-        } else if to.0 >= (WIDTH - BALL_SIZE) as f64 {
-            return Some(GameResult::Win);
-        }
-
-        // No obstructions
-
-        self.ball = to;
         None
+    }
+
+    // Calculate ball bounce angle off paddle
+
+    fn calc_bounce_angle(ball_pos: f64, paddle_pos: f64) -> f64 {
+        45.0
     }
 
     // Return initial game values

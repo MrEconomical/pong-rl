@@ -21,7 +21,7 @@ struct Velocity {
 
 // Paddle movement input direction
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub enum PaddleMove {
     Up,
     Down,
@@ -272,7 +272,13 @@ impl Pong {
         let ball_center = ball_y + BALL_SIZE as f64 / 2.0;
         let paddle_center = paddle_y as f64 + PADDLE_HEIGHT as f64 / 2.0;
         let real_offset = 2.0 * (ball_center - paddle_center) / PADDLE_HEIGHT as f64;
-        return real_offset.sqrt() * MAX_BOUNCE_ANGLE;
+
+        let scale_factor = if real_offset < 0.0 {
+            -(-real_offset).sqrt()
+        } else {
+            real_offset.sqrt()
+        };
+        return scale_factor * MAX_BOUNCE_ANGLE;
     }
 
     // Return initial game values

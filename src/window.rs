@@ -14,7 +14,7 @@ use winit::window::WindowBuilder;
 
 // Window event
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub enum UserEvent {
     GameInput(PaddleInput),
     Exit,
@@ -22,7 +22,7 @@ pub enum UserEvent {
 
 // Paddle input
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 pub enum PaddleInput {
     Up,
     StopUp,

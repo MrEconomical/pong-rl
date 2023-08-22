@@ -225,7 +225,7 @@ impl Pong {
 
             // Change ball velocity based on bounce position
 
-            let angle = Self::calc_bounce_angle(self.ball.1, self.right_paddle.1);
+            let angle = Self::calc_bounce_angle(self.ball.1, self.left_paddle.1);
             self.ball_velocity.x = BALL_SPEED * angle.to_radians().cos();
             self.ball_velocity.y = BALL_SPEED * angle.to_radians().sin();
 

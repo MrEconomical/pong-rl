@@ -1,4 +1,4 @@
-use crate::core::Pong;
+use crate::core::{GameResult, PaddleMove, Pong};
 use crate::window;
 use crate::window::UserEvent;
 use std::sync::mpsc::Receiver;
@@ -42,6 +42,23 @@ impl PongEnv {
 
     fn start(&mut self) {
         self.pong.start_game();
+    }
+
+    // Advance game with action and return reward
+
+    fn tick(&mut self, action: i32) -> i32 {
+        let input = if action == 0 {
+            Some(PaddleMove::Down)
+        } else {
+            Some(PaddleMove::Up)
+        };
+
+        let game_result = self.pong.tick(input);
+        match game_result {
+            Some(GameResult::Win) => 1,
+            Some(GameResult::Lose) => -1,
+            None => 0,
+        }
     }
 
     // Reset game to initial state

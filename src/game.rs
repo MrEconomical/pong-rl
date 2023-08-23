@@ -29,7 +29,7 @@ pub struct PongGame {
 }
 
 impl PongGame {
-    // Create window with event loop and initialize pong game
+    // Create window with event loop and initialize Pong game
 
     #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
@@ -46,7 +46,7 @@ impl PongGame {
         }
     }
 
-    // Clear input buffer and start pong game with initial state
+    // Clear input buffer and start Pong game with initial state
 
     pub fn start(&mut self) -> bool {
         let exited = self.process_events();

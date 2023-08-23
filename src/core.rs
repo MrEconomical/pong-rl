@@ -47,7 +47,7 @@ pub struct Pong {
 }
 
 impl Pong {
-    // Create pong game with optional Pixels display
+    // Create Pong game with optional Pixels display
 
     pub fn new(pixels: Option<Arc<Mutex<Pixels>>>) -> Self {
         Pong {

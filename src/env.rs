@@ -1,8 +1,5 @@
 use crate::core::Pong;
 use crate::window;
-use crate::window::UserEvent;
-use std::sync::mpsc::Receiver;
-use std::thread::JoinHandle;
 
 use pyo3::{pyclass, pymethods};
 
@@ -11,7 +8,6 @@ use pyo3::{pyclass, pymethods};
 #[pyclass]
 pub struct PongEnv {
     pong: Pong,
-    render: bool,
 }
 
 // Methods exposed to Python
@@ -25,7 +21,6 @@ impl PongEnv {
         let (pixels, _, _) = window::create_window();
         Self {
             pong: Pong::new(Some(pixels)),
-            render: true,
         }
     }
 
@@ -35,7 +30,12 @@ impl PongEnv {
     fn without_render() -> Self {
         Self {
             pong: Pong::new(None),
-            render: false,
         }
+    }
+
+    // Start Pong game with initial state
+
+    fn start(&mut self) {
+        self.pong.start_game();
     }
 }

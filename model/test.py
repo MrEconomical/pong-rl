@@ -1,4 +1,7 @@
 import pong_rl
 
-pong = pong_rl.PongEnv.with_render()
-pong.run_window()
+PongEnv = pong_rl.PongEnv
+
+pong = PongEnv.with_render()
+while True:
+    pass

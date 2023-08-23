@@ -1,5 +1,6 @@
 # reinforcement learning agent with full model of Pong environment
 
+import numpy as np
 import pong_rl
 import random
 

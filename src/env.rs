@@ -3,7 +3,8 @@ use crate::window;
 use crate::window::UserEvent;
 use std::sync::mpsc::Receiver;
 
-use pyo3::{pyclass, pymethods};
+use numpy::PyArray1;
+use pyo3::{pyclass, pymethods, Python};
 
 // Python-controlled Pong environment
 
@@ -63,8 +64,8 @@ impl PongEnv {
 
     // Get full internal game state
 
-    fn get_game_state(&self) -> [f64; 6] {
-        self.pong.get_game_state()
+    fn get_game_state<'py>(&self, py: Python<'py>) -> &'py PyArray1<f64> {
+        PyArray1::from_slice(py, &self.pong.get_game_state())
     }
 
     // Reset game to initial state

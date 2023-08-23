@@ -120,6 +120,19 @@ impl Pong {
         self.ended = false;
     }
 
+    // Get ball position, ball velocity, and paddle positions
+
+    pub fn get_game_state(&self) -> [f64; 6] {
+        [
+            self.ball.0,
+            self.ball.1,
+            self.ball_velocity.x,
+            self.ball_velocity.y,
+            self.left_paddle.1 as f64,
+            self.right_paddle.1 as f64,
+        ]
+    }
+
     // Move ball with collision detection and return if game ended
 
     fn move_ball(&mut self, to: FloatPoint) -> Option<GameResult> {

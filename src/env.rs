@@ -61,6 +61,12 @@ impl PongEnv {
         }
     }
 
+    // Get full internal game state
+
+    fn get_game_state(&self) -> [f64; 6] {
+        self.pong.get_game_state()
+    }
+
     // Reset game to initial state
 
     pub fn reset(&mut self) {

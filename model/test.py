@@ -7,6 +7,6 @@ pong = PongEnv.with_render()
 pong.start()
 while True:
     reward = pong.tick(0 if random.random() < 0.5 else 1)
-    print("reward for frame:", reward)
     if reward != 0:
+        print("final reward:", reward)
         break

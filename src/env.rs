@@ -1,5 +1,7 @@
 use crate::core::Pong;
 use crate::window;
+use crate::window::UserEvent;
+use std::sync::mpsc::Receiver;
 
 use pyo3::{pyclass, pymethods};
 
@@ -8,6 +10,7 @@ use pyo3::{pyclass, pymethods};
 #[pyclass]
 pub struct PongEnv {
     pong: Pong,
+    _event_channel: Option<Receiver<UserEvent>>,
 }
 
 // Methods exposed to Python
@@ -18,9 +21,10 @@ impl PongEnv {
 
     #[staticmethod]
     fn with_render() -> Self {
-        let (pixels, _, _) = window::create_window();
+        let (pixels, event_channel, _) = window::create_window();
         Self {
             pong: Pong::new(Some(pixels)),
+            _event_channel: Some(event_channel),
         }
     }
 
@@ -30,12 +34,19 @@ impl PongEnv {
     fn without_render() -> Self {
         Self {
             pong: Pong::new(None),
+            _event_channel: None,
         }
     }
 
-    // Start Pong game with initial state
+    // Start game with initial state
 
     fn start(&mut self) {
         self.pong.start_game();
+    }
+
+    // Reset game to initial state
+
+    pub fn reset(&mut self) {
+        self.pong.clear_game();
     }
 }

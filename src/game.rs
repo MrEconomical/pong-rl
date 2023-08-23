@@ -46,7 +46,7 @@ impl PongGame {
         }
     }
 
-    // Clear input buffer and start Pong game with initial state
+    // Clear input buffer and start game with initial state
 
     pub fn start(&mut self) -> bool {
         let exited = self.process_events();

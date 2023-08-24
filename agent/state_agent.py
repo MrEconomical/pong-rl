@@ -1,6 +1,6 @@
 # reinforcement learning agent with full state of Pong environment
 
-from model import Model
+from stochastic_model import Model
 import numpy as np
 import pong_rl
 import random

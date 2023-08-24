@@ -1,5 +1,7 @@
-# neural network model class with 1 hidden layer and 1 output neuron and relu
-# activation for the hidden layer and sigmoid activation for the output neuron
+'''
+stochastic gradient descent neural network model class with 1 hidden layer and 
+1 output neuron using relu for the hidden layer and sigmoid for the output neuron
+'''
 
 import numpy as np
 

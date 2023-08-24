@@ -40,14 +40,14 @@ class Model:
     # update weights with back propagation
 
     def back_prop(self, input_data, hidden_output, output, expected):
-        # calculate output neuron gradient
+        # calculate gradients for output neuron using sigmoid derivative
 
         output_delta = (output - expected) * (output * (1 - output)) # using sigmoid derivative
         output_gradient = np.empty(self.hidden_size + 1)
         output_gradient[:-1] = output_delta * hidden_output # set output weight derivatives
         output_gradient[-1] = output_delta # bias is a fixed input of 1
 
-        # calculate hidden layer gradients
+        # calculate gradients for hidden neurons using relu derivative
 
         hidden_deltas = output_delta * self.weights[1][:-1] * (hidden_output > 0) # using relu derivative
         hidden_gradients = np.empty((self.hidden_size, self.input_size + 1))

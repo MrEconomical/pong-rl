@@ -5,13 +5,32 @@ import numpy as np
 import pong_rl
 import random
 
-# create model
+# create or load model
 
-model = Model.with_random_weights(
-    6, # input size
-    10, # hidden size
-    0.01 # learning rate
-)
+load_model = False
+checkpoint = 1
+checkpoint_episodes = 50
+
+model = None
+if load_model:
+    model = Model.from_save("agent/models/state_stochastic_" + str(checkpoint) + ".json")
+    print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
+        model.input_size,
+        model.hidden_size,
+        model.learning_rate,
+        checkpoint
+    ))
+else:
+    model = Model.with_random_weights(
+        6, # input size
+        10, # hidden size
+        0.01 # learning rate
+    )
+    print("created new model with parameters ({}, {}, {})".format(
+        model.input_size,
+        model.hidden_size,
+        model.learning_rate
+    ))
 
 # create Pong environment
 

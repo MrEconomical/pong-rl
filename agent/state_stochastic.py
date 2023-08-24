@@ -9,7 +9,7 @@ import random
 
 load_model = False
 checkpoint = 1
-checkpoint_episodes = 50
+epoch_length = 50
 
 model = None
 if load_model:
@@ -35,12 +35,25 @@ else:
 # create Pong environment
 
 pong = pong_rl.PongEnv.with_render()
-pong.start()
+episode_num = 0
 
 while True:
-    reward = pong.tick(0 if random.random() < 0.5 else 1)
-    game_state = pong.get_game_state()
-    print("game state:", game_state)
-    if reward != 0:
+    # collect and train agent over epoch
+
+    for e in range(epoch_length):
+        episode_num += 1
+        episode_states = []
+        reward = 0
+
+        pong.start()
+        while reward == 0:
+            game_state = pong.get_game_state()
+            h, action_prob = model.forward(game_state)
+            action = 1 if np.random.uniform() < action_prob else 0
+            episode_states.append((game_state, action))
+            reward = pong.tick(action)
+        
+        print("FINISHED EPISODE:")
+        print(episode_states)
         print("final reward:", reward)
-        break
+        exit()

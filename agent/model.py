@@ -22,3 +22,13 @@ class Model:
             np.random.randn(hidden_size, input_size + 1) / np.sqrt(input_size + 1),
             np.random.randn(hidden_size + 1) / np.sqrt(hidden_size + 1),
         ]
+    
+    def forward(self, input):
+        # calculate forward propagation result
+
+        hidden_output = np.dot(self.weights[0][:, :-1], input) + self.weights[0][:, -1:].flat
+        hidden_output[hidden_output < 0] = 0 # relu activation
+        output = np.dot(self.weights[1][:-1], hidden_output) + self.weights[1][-1]
+        output = 1 / (1 + np.exp(-output)) # sigmoid activation
+
+        return hidden_output, output

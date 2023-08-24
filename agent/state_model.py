@@ -8,10 +8,12 @@ import random
 PongEnv = pong_rl.PongEnv
 model = Model(
     6, # input size
-    20, # hidden size
+    6, # hidden size
     0.01 # learning rate
 )
 print(model.weights)
+hidden_output, output = model.forward([1, 1, 1, 1, 1, 1])
+print(hidden_output, output)
 
 '''
 pong = PongEnv.with_render()

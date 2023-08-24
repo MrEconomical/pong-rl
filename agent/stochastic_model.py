@@ -29,7 +29,7 @@ class Model:
         hidden_weights[:, -1] = 0
 
         output_weights = np.empty(hidden_size + 1)
-        output_weights[:-1] = np.random.randn(hidden_size) / np.sqrt(hidden_size) # Xavier initialization
+        output_weights[:-1] = np.random.randn(hidden_size) * np.sqrt(1 / hidden_size) # Xavier initialization
         output_weights[-1] = 0
 
         return self(

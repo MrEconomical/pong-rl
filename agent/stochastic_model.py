@@ -24,14 +24,19 @@ class Model:
 
     @classmethod
     def with_random_weights(self, input_size, hidden_size, learning_rate):
+        hidden_weights = np.empty((hidden_size, input_size + 1))
+        hidden_weights[:, :-1] = np.random.randn(hidden_size, input_size) / np.sqrt(input_size)
+        hidden_weights[:, -1] = 0
+
+        output_weights = np.empty(hidden_size + 1)
+        output_weights[:-1] = np.random.randn(hidden_size) / np.sqrt(hidden_size)
+        output_weights[-1] = 0
+
         return self(
             input_size,
             hidden_size,
             learning_rate,
-            [
-                np.random.randn(hidden_size, input_size + 1) / np.sqrt(input_size + 1),
-                np.random.randn(hidden_size + 1) / np.sqrt(hidden_size + 1),
-            ]
+            [hidden_weights, output_weights]
         )
 
     # load model from file

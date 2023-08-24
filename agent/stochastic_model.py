@@ -3,6 +3,7 @@ stochastic gradient descent neural network model class with 1 hidden layer and
 1 output neuron using relu for the hidden layer and sigmoid for the output neuron
 '''
 
+import json
 import numpy as np
 
 class Model:
@@ -11,20 +12,19 @@ class Model:
     learning_rate = None
     weights = None
 
-    # initialize parameters and weights
+    # initialize hyperparameters
 
     def __init__(self, input_size, hidden_size, learning_rate):
-        # set hyperparameters
-
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.learning_rate = learning_rate
+    
+    # initialize random weights with Xavier initialization
 
-        # initialize weights with Xavier initialization
-
+    def init_weights(self):
         self.weights = [
-            np.random.randn(hidden_size, input_size + 1) / np.sqrt(input_size + 1),
-            np.random.randn(hidden_size + 1) / np.sqrt(hidden_size + 1),
+            np.random.randn(self.hidden_size, self.input_size + 1) / np.sqrt(self.input_size + 1),
+            np.random.randn(self.hidden_size + 1) / np.sqrt(self.hidden_size + 1),
         ]
     
     # calculate forward propagation result
@@ -62,3 +62,23 @@ class Model:
         # return mean squared error
 
         return 0.5 * (expected - output) ** 2
+
+    # load weights from file
+
+    def load_weights(self, file_path):
+        with open(file_path, "r") as file:
+            weights = json.load(file)
+            self.weights = [
+                np.array(weights[0]),
+                np.array(weights[1]),
+            ]
+    
+    # save weights to file
+
+    def save_weights(self, file_path):
+        serialized_weights = json.dumps([
+            self.weights[0].tolist(),
+            self.weights[1].tolist(),
+        ], indent=4)
+        with open(file_path, "w") as file:
+            file.write(serialized_weights)

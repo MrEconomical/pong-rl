@@ -23,10 +23,10 @@ class Model:
             np.random.randn(hidden_size + 1) / np.sqrt(hidden_size + 1),
         ]
     
-    def forward(self, input):
+    def forward(self, input_data):
         # calculate forward propagation result
 
-        hidden_output = np.dot(self.weights[0][:, :-1], input) + self.weights[0][:, -1:].flat
+        hidden_output = np.dot(self.weights[0][:, :-1], input_data) + self.weights[0][:, -1:].reshape(self.hidden_size)
         hidden_output[hidden_output < 0] = 0 # relu activation
         output = np.dot(self.weights[1][:-1], hidden_output) + self.weights[1][-1]
         output = 1 / (1 + np.exp(-output)) # sigmoid activation

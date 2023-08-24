@@ -1,4 +1,4 @@
-# reinforcement learning agent with full state of Pong environment
+# stochastic gradient descent with full state of Pong environment
 
 from stochastic_model import Model
 import numpy as np
@@ -7,10 +7,10 @@ import random
 
 # create model
 
-model = Model(
-    3, # input size
-    5, # hidden size
-    0.05 # learning rate
+model = Model.with_random_weights(
+    6, # input size
+    10, # hidden size
+    0.01 # learning rate
 )
 
 # create Pong environment

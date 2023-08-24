@@ -12,20 +12,44 @@ class Model:
     learning_rate = None
     weights = None
 
-    # initialize hyperparameters
+    # set model data
 
-    def __init__(self, input_size, hidden_size, learning_rate):
+    def __init__(self, input_size, hidden_size, learning_rate, weights):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.learning_rate = learning_rate
-    
-    # initialize random weights with Xavier initialization
+        self.weights = weights
 
-    def init_weights(self):
-        self.weights = [
-            np.random.randn(self.hidden_size, self.input_size + 1) / np.sqrt(self.input_size + 1),
-            np.random.randn(self.hidden_size + 1) / np.sqrt(self.hidden_size + 1),
-        ]
+    # create new model with Xavier initialization weights
+
+    @classmethod
+    def with_random_weights(self, input_size, hidden_size, learning_rate):
+        return self(
+            input_size,
+            hidden_size,
+            learning_rate,
+            [
+                np.random.randn(hidden_size, input_size + 1) / np.sqrt(input_size + 1),
+                np.random.randn(hidden_size + 1) / np.sqrt(hidden_size + 1),
+            ]
+        )
+
+    # load model from file
+
+    @classmethod
+    def from_save(self, file_name):
+        model_data = None
+        with open(file_name, "r") as file:
+            model_data = json.load(file)
+        return self(
+            model_data["input_size"],
+            model_data["hidden_size"],
+            model_data["learning_rate"],
+            [
+                np.array(model_data["weights"][0]),
+                np.array(model_data["weights"][1]),
+            ]
+        )
     
     # calculate forward propagation result
 
@@ -61,24 +85,22 @@ class Model:
 
         # return mean squared error
 
-        return 0.5 * (expected - output) ** 2
-
-    # load weights from file
-
-    def load_weights(self, file_path):
-        with open(file_path, "r") as file:
-            weights = json.load(file)
-            self.weights = [
-                np.array(weights[0]),
-                np.array(weights[1]),
-            ]
+        return (expected - output) ** 2
     
-    # save weights to file
+    # save model to file
 
-    def save_weights(self, file_path):
-        serialized_weights = json.dumps([
-            self.weights[0].tolist(),
-            self.weights[1].tolist(),
-        ], indent=4)
+    def save(self, file_path):
+        serialized_model = json.dumps(
+            {
+                "input_size": self.input_size,
+                "hidden_size": self.hidden_size,
+                "learning_rate": self.learning_rate,
+                "weights": [
+                    self.weights[0].tolist(),
+                    self.weights[1].tolist(),
+                ],
+            },
+            indent=4,
+        )
         with open(file_path, "w") as file:
-            file.write(serialized_weights)
+            file.write(serialized_model)

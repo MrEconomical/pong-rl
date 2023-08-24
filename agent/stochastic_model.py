@@ -30,7 +30,7 @@ class Model:
     # calculate forward propagation result
 
     def forward(self, input_data):
-        hidden_output = np.dot(self.weights[0][:, :-1], input_data) + self.weights[0][:, -1:].reshape(self.hidden_size)
+        hidden_output = np.dot(self.weights[0][:, :-1], input_data) + self.weights[0][:, -1]
         np.maximum(hidden_output, 0, out=hidden_output) # relu activation
         output = np.dot(self.weights[1][:-1], hidden_output) + self.weights[1][-1]
         output = 1 / (1 + np.exp(-output)) # sigmoid activation
@@ -40,30 +40,24 @@ class Model:
     # update weights with back propagation
 
     def back_prop(self, input_data, hidden_output, output, expected):
-        # calculate output delta and new output neuron weights
+        # calculate output neuron gradient
 
         output_delta = (output - expected) * (output * (1 - output)) # using sigmoid derivative
-        updated_output_weights = np.empty(self.hidden_size + 1)
-        updated_output_weights[:-1] = output_delta * hidden_output # set output weight derivatives
-        updated_output_weights[-1] = output_delta # bias is a fixed input of 1
+        output_gradient = np.empty(self.hidden_size + 1)
+        output_gradient[:-1] = output_delta * hidden_output # set output weight derivatives
+        output_gradient[-1] = output_delta # bias is a fixed input of 1
 
-        updated_output_weights *= -self.learning_rate
-        updated_output_weights += self.weights[1]
-
-        # back propagate error to hidden layer
+        # calculate hidden layer gradients
 
         hidden_deltas = output_delta * self.weights[1][:-1] * (hidden_output > 0) # using relu derivative
-        updated_hidden_weights = np.empty((self.hidden_size, self.input_size + 1))
-        updated_hidden_weights[:, :-1] = np.outer(hidden_deltas, input_data) # set hidden weight derivatives
-        updated_hidden_weights[:, -1:] = np.reshape(hidden_deltas, (self.hidden_size, 1)) # bias is a fixed input of 1
+        hidden_gradients = np.empty((self.hidden_size, self.input_size + 1))
+        hidden_gradients[:, :-1] = np.outer(hidden_deltas, input_data) # set hidden weight derivatives
+        hidden_gradients[:, -1:] = np.reshape(hidden_deltas, (self.hidden_size, 1)) # bias is a fixed input of 1
 
-        updated_hidden_weights *= -self.learning_rate
-        updated_hidden_weights += self.weights[0]
+        # update model weights
 
-        # set model weights
-
-        self.weights[0] = updated_hidden_weights
-        self.weights[1] = updated_output_weights
+        self.weights[0] -= self.learning_rate * hidden_gradients
+        self.weights[1] -= self.learning_rate * output_gradient
 
         # return mean squared error
 

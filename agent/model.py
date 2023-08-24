@@ -62,3 +62,7 @@ class Model:
 
         self.weights[0] = updated_hidden_weights
         self.weights[1] = updated_output_weights
+
+        # return mean squared error
+
+        return 0.5 * (expected - output) ** 2

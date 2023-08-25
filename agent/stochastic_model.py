@@ -71,20 +71,21 @@ class Model:
 
     # update weights with back propagation
 
-    def back_prop(self, input_data, hidden_output, output, action, advantage):
+    def back_prop(self, inputs, hidden_outputs, probs, advantages):
         # calculate gradients for output neuron using policy gradient theorem
 
-        output_delta = advantage * (action - output) # using policy gradient theorem
+        output_deltas = probs * advantages # using policy gradient theorem
         output_gradient = np.empty(self.hidden_size + 1)
-        output_gradient[:-1] = output_delta * hidden_output # set output weight derivatives
-        output_gradient[-1] = output_delta # bias is a fixed input of 1
+        output_gradient[:-1] = np.dot(hidden_outputs.transpose(), output_deltas) # set output weight derivatives
+        output_gradient[-1] = np.sum(output_deltas) # bias is a fixed input of 1
 
         # calculate gradients for hidden neurons using relu derivative
 
-        hidden_deltas = output_delta * self.weights[1][:-1] * (hidden_output > 0) # using relu derivative
+        hidden_deltas = np.outer(output_deltas, self.weights[1][:-1]) # calculate deltas for each input
+        hidden_deltas[hidden_outputs <= 0] = 0 # apply relu derivative
         hidden_gradients = np.empty((self.hidden_size, self.input_size + 1))
-        hidden_gradients[:, :-1] = np.outer(hidden_deltas, input_data) # set hidden weight derivatives
-        hidden_gradients[:, -1:] = np.reshape(hidden_deltas, (self.hidden_size, 1)) # bias is a fixed input of 1
+        hidden_gradients[:, :-1] = np.dot(hidden_deltas.transpose(), inputs) # set hidden weight derivatives
+        hidden_gradients[:, -1] = np.sum(hidden_deltas.transpose(), axis=1)
 
         # update model weights
 

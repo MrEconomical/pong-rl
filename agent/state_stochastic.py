@@ -23,9 +23,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        10, # hidden size
+        20, # hidden size
         0.99, # reward discount rate
-        0.005, # learning rate
+        0.01, # learning rate
     )
     print("created new model with parameters ({}, {}, {})".format(
         model.input_size,
@@ -47,6 +47,8 @@ while True:
         pong.start()
         episode_num += 1
         episode_states = []
+        episode_hidden_outputs = []
+        episode_probs = []
         final_reward = 0
         
         while final_reward == 0:
@@ -56,35 +58,27 @@ while True:
             hidden_output, action_prob = model.forward(game_state)
             action = 1 if np.random.uniform() < action_prob else 0
 
-            # store action and get reward
+            # store action data and get reward
 
-            episode_states.append((
-                game_state,
-                hidden_output,
-                action_prob,
-                action,
-            ))
+            episode_states.append(game_state)
+            episode_hidden_outputs.append(hidden_output)
+            episode_probs.append(action - action_prob)
             final_reward = pong.tick(action)
         
-        # calculate discounted rewards
+        # back propagate discounted rewards through model
         
         discounted_rewards = model.discount_rewards(final_reward, len(episode_states))
-
-        # back propagate rewards through model
-        # todo: batch with numpy
-
-        for s in range(len(episode_states)):
-            model.back_prop(
-                episode_states[s][0],
-                episode_states[s][1],
-                episode_states[s][2],
-                episode_states[s][3],
-                discounted_rewards[s],
-            )
+        model.back_prop(
+            np.array(episode_states),
+            np.array(episode_hidden_outputs),
+            np.array(episode_probs),
+            discounted_rewards,
+        )
         
         # reset game environment
 
         pong.reset()
+        exit()
         
         if episode_num % 100 == 0:
             print("FINISHED EPISODE:", episode_num)

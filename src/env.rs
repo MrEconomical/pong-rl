@@ -1,3 +1,4 @@
+use crate::config::{BALL_SPEED, HEIGHT, WIDTH};
 use crate::core::{GameResult, PaddleMove, Pong};
 use crate::window;
 use crate::window::UserEvent;
@@ -62,10 +63,21 @@ impl PongEnv {
         }
     }
 
-    // Get full internal game state
+    // Normalize full internal game state
 
-    fn get_game_state<'py>(&self, py: Python<'py>) -> &'py PyArray1<f64> {
-        PyArray1::from_slice(py, &self.pong.get_game_state())
+    fn get_normalized_state<'py>(&self, py: Python<'py>) -> &'py PyArray1<f64> {
+        let state = self.pong.get_game_state();
+        PyArray1::from_slice(
+            py,
+            &[
+                (state[0] / WIDTH as f64 - 0.5) * 2.0,  // Ball x position
+                (state[1] / HEIGHT as f64 - 0.5) * 2.0, // Ball y position
+                state[2] / BALL_SPEED as f64,           // Ball x velocity
+                state[3] / BALL_SPEED as f64,           // Ball y velocity
+                (state[4] / HEIGHT as f64 - 0.5) * 2.0, // Left paddle y position
+                (state[5] / HEIGHT as f64 - 0.5) * 2.0, // Right paddle y position
+            ],
+        )
     }
 
     // Reset game to initial state

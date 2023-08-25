@@ -23,9 +23,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        20, # hidden size
+        30, # hidden size
         0.99, # reward discount rate
-        0.01, # learning rate
+        0.1, # learning rate
     )
     print("created new model with parameters ({}, {}, {})".format(
         model.input_size,
@@ -35,7 +35,7 @@ else:
 
 # create Pong environment
 
-pong = pong_rl.PongEnv.without_render()
+pong = pong_rl.PongEnv.with_render()
 episode_num = 0
 
 while True:
@@ -54,7 +54,8 @@ while True:
         while final_reward == 0:
             # predict action
 
-            game_state = pong.get_game_state()
+            game_state = pong.get_normalized_state()
+            print("got game state:", game_state)
             hidden_output, action_prob = model.forward(game_state)
             action = 1 if np.random.uniform() < action_prob else 0
 
@@ -78,9 +79,11 @@ while True:
         # reset game environment
 
         pong.reset()
-        exit()
-        
-        if episode_num % 100 == 0:
+
+        print(episode_probs)
+        if episode_num % 1 == 0:
             print("FINISHED EPISODE:", episode_num)
             print("final reward:", final_reward)
             print(model.weights[1])
+        
+        exit()

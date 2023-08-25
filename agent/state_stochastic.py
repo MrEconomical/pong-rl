@@ -3,7 +3,6 @@
 from stochastic_model import Model
 import numpy as np
 import pong_rl
-import random
 
 # create or load model
 
@@ -23,9 +22,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        30, # hidden size
+        40, # hidden size
         0.99, # reward discount rate
-        0.1, # learning rate
+        0.01, # learning rate
     )
     print("created new model with parameters ({}, {}, {})".format(
         model.input_size,
@@ -35,8 +34,10 @@ else:
 
 # create Pong environment
 
-pong = pong_rl.PongEnv.with_render()
+pong = pong_rl.PongEnv.without_render()
 episode_num = 0
+wins = 0
+losses = 0
 
 while True:
     # collect and train agent over epoch
@@ -55,7 +56,6 @@ while True:
             # predict action
 
             game_state = pong.get_normalized_state()
-            print("got game state:", game_state)
             hidden_output, action_prob = model.forward(game_state)
             action = 1 if np.random.uniform() < action_prob else 0
 
@@ -65,6 +65,11 @@ while True:
             episode_hidden_outputs.append(hidden_output)
             episode_probs.append(action - action_prob)
             final_reward = pong.tick(action)
+        
+        if final_reward == -1:
+            losses += 1
+        else:
+            wins += 1
         
         # back propagate discounted rewards through model
         
@@ -80,10 +85,7 @@ while True:
 
         pong.reset()
 
-        print(episode_probs)
-        if episode_num % 1 == 0:
+        if episode_num % 1000 == 0:
             print("FINISHED EPISODE:", episode_num)
-            print("final reward:", final_reward)
-            print(model.weights[1])
-        
-        exit()
+            print("wins and losses:", wins, losses)
+            print(model.weights[1][0:5])

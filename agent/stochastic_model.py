@@ -14,16 +14,17 @@ class Model:
 
     # set model data
 
-    def __init__(self, input_size, hidden_size, learning_rate, weights):
+    def __init__(self, input_size, hidden_size, discount_rate, learning_rate, weights):
         self.input_size = input_size
         self.hidden_size = hidden_size
+        self.discount_rate = discount_rate
         self.learning_rate = learning_rate
         self.weights = weights
 
     # create new model with He and Xavier initialization
 
     @classmethod
-    def with_random_weights(self, input_size, hidden_size, learning_rate):
+    def with_random_weights(self, input_size, hidden_size, discount_rate, learning_rate):
         hidden_weights = np.empty((hidden_size, input_size + 1))
         hidden_weights[:, :-1] = np.random.randn(hidden_size, input_size) * np.sqrt(2 / input_size) # He initialization
         hidden_weights[:, -1] = 0
@@ -35,6 +36,7 @@ class Model:
         return self(
             input_size,
             hidden_size,
+            discount_rate,
             learning_rate,
             [hidden_weights, output_weights]
         )
@@ -49,6 +51,7 @@ class Model:
         return self(
             model_data["input_size"],
             model_data["hidden_size"],
+            model_data["discount_rate"],
             model_data["learning_rate"],
             [
                 np.array(model_data["weights"][0]),
@@ -95,6 +98,7 @@ class Model:
             {
                 "input_size": self.input_size,
                 "hidden_size": self.hidden_size,
+                "discount_rate": self.discount_rate,
                 "learning_rate": self.learning_rate,
                 "weights": [
                     self.weights[0].tolist(),
@@ -105,3 +109,13 @@ class Model:
         )
         with open(file_path, "w") as file:
             file.write(serialized_model)
+    
+    # calculate discounted rewards array with length
+
+    def discount_rewards(self, final_reward, length):
+        discounted_rewards = np.empty(length)
+        reward = final_reward
+        for r in reversed(range(length)):
+            discounted_rewards[r] = reward
+            reward *= self.discount_rate
+        return discounted_rewards

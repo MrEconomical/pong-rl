@@ -50,7 +50,7 @@ while True:
             game_state = pong.get_game_state()
             h, action_prob = model.forward(game_state)
             action = 1 if np.random.uniform() < action_prob else 0
-            episode_states.append((game_state, action))
+            episode_states.append((game_state, action_prob, action))
             reward = pong.tick(action)
         
         print("FINISHED EPISODE:")

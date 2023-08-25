@@ -1,5 +1,5 @@
 '''
-stochastic gradient descent neural network model class with 1 hidden layer and 
+traditional mean squared error neural network model class with 1 hidden layer and
 1 output neuron using relu for the hidden layer and sigmoid for the output neuron
 '''
 
@@ -68,10 +68,10 @@ class Model:
 
     # update weights with back propagation
 
-    def back_prop(self, input_data, hidden_output, output, action, advantage):
-        # calculate gradients for output neuron using policy gradient theorem
+    def back_prop(self, input_data, hidden_output, output, expected):
+        # calculate gradients for output neuron using sigmoid derivative
 
-        output_delta = advantage * (action - output) # using policy gradient theorem
+        output_delta = (output - expected) * (output * (1 - output)) # using sigmoid derivative
         output_gradient = np.empty(self.hidden_size + 1)
         output_gradient[:-1] = output_delta * hidden_output # set output weight derivatives
         output_gradient[-1] = output_delta # bias is a fixed input of 1
@@ -87,6 +87,10 @@ class Model:
 
         self.weights[0] -= self.learning_rate * hidden_gradients
         self.weights[1] -= self.learning_rate * output_gradient
+
+        # return mean squared error
+
+        return (expected - output) ** 2
     
     # save model to file
 

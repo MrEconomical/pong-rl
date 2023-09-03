@@ -17,7 +17,7 @@ if load_model:
         model.input_size,
         model.hidden_size,
         model.learning_rate,
-        checkpoint
+        checkpoint,
     ))
 else:
     model = Model.with_random_weights(
@@ -29,7 +29,7 @@ else:
     print("created new model with parameters ({}, {}, {})".format(
         model.input_size,
         model.hidden_size,
-        model.learning_rate
+        model.learning_rate,
     ))
 
 # create Pong environment

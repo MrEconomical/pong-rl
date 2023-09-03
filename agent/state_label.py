@@ -92,6 +92,7 @@ while True:
 
     pong.reset()
 
-    print("FINISHED EPISODE:", episode_num)
-    print("wins and losses:", wins, losses)
-    print(model.weights[1][0:5])
+    if episode_num % 100 == 0:
+        print("FINISHED EPISODE:", episode_num)
+        print("wins and losses:", wins, losses)
+        print(model.weights[1][0:5])

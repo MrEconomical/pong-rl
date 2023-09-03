@@ -12,7 +12,7 @@ epoch_length = 50
 
 model = None
 if load_model:
-    model = Model.from_save("agent/models/state_stochastic_" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/models/state_stochastic/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,

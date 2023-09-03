@@ -1,4 +1,4 @@
-use crate::config::{BALL_SPEED, HEIGHT, WIDTH};
+use crate::config::{BALL_SIZE, BALL_SPEED, HEIGHT, PADDLE_HEIGHT, WIDTH};
 use crate::core::{GameResult, PaddleMove, Pong};
 use crate::window;
 use crate::window::UserEvent;
@@ -70,12 +70,12 @@ impl PongEnv {
         PyArray1::from_slice(
             py,
             &[
-                (state[0] / WIDTH as f64 - 0.5) * 2.0,  // Ball x position
-                (state[1] / HEIGHT as f64 - 0.5) * 2.0, // Ball y position
-                state[2] / BALL_SPEED as f64,           // Ball x velocity
-                state[3] / BALL_SPEED as f64,           // Ball y velocity
-                (state[4] / HEIGHT as f64 - 0.5) * 2.0, // Left paddle y position
-                (state[5] / HEIGHT as f64 - 0.5) * 2.0, // Right paddle y position
+                ((state[0] + BALL_SIZE as f64 / 2.0) / WIDTH as f64 - 0.5) * 2.0, // Ball x position
+                ((state[1] + BALL_SIZE as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Ball y position
+                state[2] / BALL_SPEED as f64, // Ball x velocity
+                state[3] / BALL_SPEED as f64, // Ball y velocity
+                ((state[4] + PADDLE_HEIGHT as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Left paddle y position
+                ((state[5] + PADDLE_HEIGHT as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Right paddle y position
             ],
         )
     }

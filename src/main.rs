@@ -1,7 +1,7 @@
 use pong_rl::FRAME_DELAY;
 use pong_rl::{PongGame, TickResult};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 // Run user-controlled Pong game
 
@@ -24,9 +24,11 @@ fn main() {
             break;
         }
 
+        let mut next_tick = Instant::now();
         loop {
             // Run game tick
 
+            thread::sleep(next_tick - Instant::now());
             let tick_result = pong.tick();
             match tick_result {
                 Some(TickResult::GameEnd) => {
@@ -36,7 +38,7 @@ fn main() {
                 }
                 Some(TickResult::Exit) => break 'reset,
                 _ => {
-                    thread::sleep(Duration::from_millis(FRAME_DELAY));
+                    next_tick += Duration::from_millis(FRAME_DELAY);
                 }
             }
         }

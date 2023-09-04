@@ -6,8 +6,8 @@ import pong_rl
 
 # create or load model
 
-load_model = False
-checkpoint = 0
+load_model = True
+checkpoint = 2
 epoch_length = 100
 
 model = None

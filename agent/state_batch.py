@@ -1,18 +1,18 @@
-# stochastic gradient descent with full state of Pong environment
+# batch gradient descent with full state of Pong environment
 
-from stochastic_model import Model
+from batch_model import Model
 import numpy as np
 import pong_rl
 
 # create or load model
 
-load_model = True
-checkpoint = 2
+load_model = False
+checkpoint = 0
 epoch_length = 100
 
 model = None
 if load_model:
-    model = Model.from_save("agent/models/state_stochastic/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/models/state_batch/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -41,6 +41,9 @@ losses = 0
 
 while True:
     # collect and train agent over epoch
+
+    hidden_gradients = np.zeros((model.hidden_size, model.input_size + 1))
+    output_gradient = np.zeros(model.hidden_size + 1)
 
     for e in range(epoch_length):
         # initialize epoch data
@@ -71,19 +74,25 @@ while True:
         else:
             wins += 1
         
-        # back propagate discounted rewards through model
+        # back propagate discounted rewards through model and add gradients
         
         discounted_rewards = model.discount_rewards(final_reward, len(episode_states))
-        model.back_prop(
+        hidden_update, output_update = model.back_prop(
             np.array(episode_states),
             np.array(episode_hidden_outputs),
             np.array(episode_probs),
             discounted_rewards,
         )
+        hidden_gradients += hidden_update
+        output_gradient += output_update
         
         # reset game environment
 
         pong.reset()
+    
+    # apply total gradients to update weights
+
+    model.apply_gradients(hidden_gradients, output_gradient)
 
     if episode_num % 5000 == 0:
         print("FINISHED EPISODE:", episode_num)

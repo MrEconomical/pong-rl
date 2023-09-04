@@ -6,8 +6,8 @@ import pong_rl
 
 # create or load model
 
-load_model = True
-checkpoint = 5
+load_model = False
+checkpoint = 0
 epoch_length = 100
 
 model = None
@@ -22,9 +22,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        20, # hidden size
+        100, # hidden size
         0.99, # reward discount rate
-        0.01, # learning rate
+        0.001, # learning rate
     )
     print("created new model with parameters ({}, {}, {})".format(
         model.input_size,
@@ -85,10 +85,10 @@ while True:
 
         pong.reset()
 
-        if episode_num % 1000 == 0:
+        if episode_num % 5000 == 0:
             print("FINISHED EPISODE:", episode_num)
             print("wins and losses:", wins, losses)
             print(model.weights[1][0:5])
-        if episode_num % 100000 == 0:
+        if episode_num % 50000 == 0:
             checkpoint += 1
             model.save("agent/models/state_stochastic/" + str(checkpoint) + ".json")

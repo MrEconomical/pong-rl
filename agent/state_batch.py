@@ -77,6 +77,9 @@ while True:
         # back propagate discounted rewards through model and add gradients
         
         discounted_rewards = model.discount_rewards(final_reward, len(episode_states))
+        discounted_rewards -= np.mean(discounted_rewards)
+        discounted_rewards /= np.std(discounted_rewards)
+        
         hidden_update, output_update = model.back_prop(
             np.array(episode_states),
             np.array(episode_hidden_outputs),

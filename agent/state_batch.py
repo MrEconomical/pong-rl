@@ -100,4 +100,4 @@ while True:
         print(model.weights[1][0:5])
     if episode_num % 50000 == 0:
         checkpoint += 1
-        model.save("agent/models/state_stochastic/" + str(checkpoint) + ".json")
+        model.save("agent/models/state_batch/" + str(checkpoint) + ".json")

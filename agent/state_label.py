@@ -6,8 +6,8 @@ import pong_rl
 
 # create or load model
 
-load_model = True
-checkpoint = 14
+load_model = False
+checkpoint = 0
 
 model = None
 if load_model:
@@ -21,7 +21,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        30, # hidden size
+        20, # hidden size
         0.01, # learning rate
     )
     print("created new model with parameters ({}, {}, {})".format(

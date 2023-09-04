@@ -6,8 +6,8 @@ import pong_rl
 
 # create or load model
 
-load_model = False
-checkpoint = 0
+load_model = True
+checkpoint = 11
 epoch_length = 100
 
 model = None
@@ -79,7 +79,7 @@ while True:
         discounted_rewards = model.discount_rewards(final_reward, len(episode_states))
         discounted_rewards -= np.mean(discounted_rewards)
         discounted_rewards /= np.std(discounted_rewards)
-        
+
         hidden_update, output_update = model.back_prop(
             np.array(episode_states),
             np.array(episode_hidden_outputs),

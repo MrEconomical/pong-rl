@@ -1,5 +1,7 @@
 use super::frame::{FloatPoint, Point};
-use crate::config::{BALL_SIZE, BORDER, COLOR, HEIGHT, TOTAL_HEIGHT, TOTAL_WIDTH};
+use crate::config::{
+    BALL_SIZE, BORDER, COLOR, EXPORT_LEN, HEIGHT, RESCALE, TOTAL_HEIGHT, TOTAL_WIDTH,
+};
 
 // Draw ball on Pixels RGBA frame at position with subpixel rendering
 
@@ -50,6 +52,14 @@ pub fn draw_border(rgba_frame: &mut [u8]) {
         }
     }
 }
+
+// Draw normalized average pixel values from ball on frame
+
+pub fn draw_scaled_ball(scaled_frame: &mut [f64; EXPORT_LEN], pos: FloatPoint) {}
+
+// Draw normalized average pixel values from paddle on frame
+
+pub fn draw_scaled_paddle(scaled_frame: &mut [f64; EXPORT_LEN], pos: Point) {}
 
 // Calculate pixel colors for ball subpixel rendering
 

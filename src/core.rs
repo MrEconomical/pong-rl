@@ -2,8 +2,8 @@ mod frame;
 mod render;
 
 use crate::config::{
-    BALL_SIZE, BALL_SPEED, HEIGHT, MAX_BOUNCE_ANGLE, MAX_INITIAL_ANGLE, PADDLE_HEIGHT,
-    PADDLE_OFFSET, PADDLE_SPEED, PADDLE_WIDTH, WIDTH,
+    BALL_SIZE, BALL_SPEED, COLOR, EXPORT_LEN, HEIGHT, MAX_BOUNCE_ANGLE, MAX_INITIAL_ANGLE,
+    PADDLE_HEIGHT, PADDLE_OFFSET, PADDLE_SPEED, PADDLE_WIDTH, WIDTH,
 };
 use frame::{FloatPoint, Frame, Point};
 use std::sync::{Arc, Mutex};
@@ -131,6 +131,14 @@ impl Pong {
             self.left_paddle.1 as f64,
             self.right_paddle.1 as f64,
         ]
+    }
+
+    // Export normalized frame data without borders
+
+    pub fn export_frame(&self, scaled_frame: &mut [f64; EXPORT_LEN]) {
+        render::draw_scaled_ball(scaled_frame, self.ball);
+        render::draw_scaled_paddle(scaled_frame, self.left_paddle);
+        render::draw_scaled_paddle(scaled_frame, self.right_paddle);
     }
 
     // Move ball with collision detection and return if game ended

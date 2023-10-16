@@ -1,4 +1,4 @@
-use crate::config::{BALL_SIZE, BALL_SPEED, HEIGHT, PADDLE_HEIGHT, WIDTH};
+use crate::config::{BALL_SIZE, BALL_SPEED, EXPORT_LEN, HEIGHT, PADDLE_HEIGHT, WIDTH};
 use crate::core::{GameResult, PaddleMove, Pong};
 use crate::window;
 use crate::window::UserEvent;
@@ -78,6 +78,14 @@ impl PongEnv {
                 ((state[5] + PADDLE_HEIGHT as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Right paddle y position
             ],
         )
+    }
+
+    // Normalize and downsize frame without border
+
+    fn get_normalized_frame<'py>(&self, py: Python<'py>) -> &'py PyArray1<f64> {
+        let mut scaled_frame = [0.0; EXPORT_LEN];
+        self.pong.export_frame(&mut scaled_frame);
+        PyArray1::from_slice(py, &scaled_frame)
     }
 
     // Reset game to initial state

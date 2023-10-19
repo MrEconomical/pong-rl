@@ -1,6 +1,6 @@
 # labeled learning with full state of Pong environment
 
-from mse_model import Model
+from models.mse_model import Model
 import numpy as np
 import pong_rl
 
@@ -11,7 +11,7 @@ checkpoint = 0
 
 model = None
 if load_model:
-    model = Model.from_save("agent/models/state_label/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/saved_models/state_label/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -96,4 +96,4 @@ while True:
         print("FINISHED EPISODE:", episode_num)
         print("wins and losses:", wins, losses)
         checkpoint += 1
-        model.save("agent/models/state_label/" + str(checkpoint) + ".json")
+        model.save("agent/saved_models/state_label/" + str(checkpoint) + ".json")

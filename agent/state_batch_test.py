@@ -1,9 +1,9 @@
-from batch_model import Model
+from models.batch_model import Model
 import numpy as np
 import pong_rl
 
 checkpoint = 11
-model = Model.from_save("agent/models/state_batch/" + str(checkpoint) + ".json")
+model = Model.from_save("agent/saved_models/state_batch/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}) from checkpoint {}".format(
     model.input_size,
     model.hidden_size,

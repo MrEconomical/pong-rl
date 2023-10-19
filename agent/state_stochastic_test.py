@@ -1,9 +1,9 @@
-from stochastic_model import Model
+from models.stochastic_model import Model
 import numpy as np
 import pong_rl
 
-checkpoint = 8
-model = Model.from_save("agent/models/state_stochastic/" + str(checkpoint) + ".json")
+checkpoint = 1
+model = Model.from_save("agent/saved_models/state_stochastic/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}) from checkpoint {}".format(
     model.input_size,
     model.hidden_size,

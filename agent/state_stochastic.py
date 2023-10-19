@@ -1,18 +1,18 @@
 # stochastic gradient descent with full state of Pong environment
 
-from stochastic_model import Model
+from models.stochastic_model import Model
 import numpy as np
 import pong_rl
 
 # create or load model
 
 load_model = True
-checkpoint = 2
+checkpoint = 1
 epoch_length = 100
 
 model = None
 if load_model:
-    model = Model.from_save("agent/models/state_stochastic/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/saved_models/state_stochastic/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -91,4 +91,4 @@ while True:
         print(model.weights[1][0:5])
     if episode_num % 50000 == 0:
         checkpoint += 1
-        model.save("agent/models/state_stochastic/" + str(checkpoint) + ".json")
+        model.save("agent/saved_models/state_stochastic/" + str(checkpoint) + ".json")

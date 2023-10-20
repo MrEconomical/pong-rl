@@ -7,7 +7,7 @@ import pong_rl
 # create or load model
 
 load_model = True
-checkpoint = 4
+checkpoint = 7
 
 model = None
 if load_model:

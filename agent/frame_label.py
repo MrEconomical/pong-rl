@@ -6,8 +6,8 @@ import pong_rl
 
 # create or load model
 
-load_model = True
-checkpoint = 1
+load_model = False
+checkpoint = 0
 
 model = None
 if load_model:

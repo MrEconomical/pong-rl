@@ -93,7 +93,7 @@ fn build_window(event_sender: Sender<UserEvent>, pixels_sender: Sender<Arc<Mutex
 // Handle window events and send user input events to channel queue
 
 fn handle_events(
-    event: Event<()>,
+    event: Event<'_, ()>,
     control_flow: &mut ControlFlow,
     event_sender: &Sender<UserEvent>,
     pixels: &Mutex<Pixels>,

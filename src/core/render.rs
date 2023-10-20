@@ -1,6 +1,7 @@
 use super::frame::{FloatPoint, Point};
 use crate::config::{
-    BALL_SIZE, BORDER, COLOR, EXPORT_LEN, HEIGHT, RESCALE, TOTAL_HEIGHT, TOTAL_WIDTH,
+    BALL_SIZE, BORDER, COLOR, EXPORT_LEN, HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, RESCALE,
+    TOTAL_HEIGHT, TOTAL_WIDTH, WIDTH,
 };
 
 // Draw ball on Pixels RGBA frame at position with subpixel rendering
@@ -55,11 +56,83 @@ pub fn draw_border(rgba_frame: &mut [u8]) {
 
 // Draw normalized average pixel values from ball on frame
 
-pub fn draw_scaled_ball(scaled_frame: &mut [f64; EXPORT_LEN], pos: FloatPoint) {}
+pub fn draw_scaled_ball(scaled_frame: &mut [f64; EXPORT_LEN], pos: FloatPoint) {
+    // Calculate range of scaled pixels that overlap the ball
+
+    let x_range = (pos.0.floor() as usize / RESCALE, {
+        let max_x = pos.0.ceil() as usize + BALL_SIZE;
+        max_x.div_ceil(RESCALE).saturating_sub(1)
+    });
+    let y_range = (pos.1.floor() as usize / RESCALE, {
+        let max_y = pos.1.ceil() as usize + BALL_SIZE;
+        max_y.div_ceil(RESCALE).saturating_sub(1)
+    });
+
+    for x in x_range.0..x_range.1 + 1 {
+        for y in y_range.0..y_range.1 + 1 {
+            // Calculate ball overlap area for each rescaled pixel
+
+            let frame_pos = ((x * RESCALE) as f64, (y * RESCALE) as f64);
+            let mut width = RESCALE as f64;
+            if frame_pos.0 < pos.0 {
+                width -= pos.0 - frame_pos.0;
+            }
+            if frame_pos.0 + RESCALE as f64 > pos.0 + BALL_SIZE as f64 {
+                width -= (frame_pos.0 + RESCALE as f64) - (pos.0 + BALL_SIZE as f64);
+            }
+            let mut height = RESCALE as f64;
+            if frame_pos.1 < pos.1 {
+                height -= pos.1 - frame_pos.1;
+            }
+            if frame_pos.1 + RESCALE as f64 > pos.1 + BALL_SIZE as f64 {
+                height -= (frame_pos.1 + RESCALE as f64) - (pos.1 + BALL_SIZE as f64);
+            }
+
+            let proportion = (width * height) / (RESCALE * RESCALE) as f64;
+            scaled_frame[y * (WIDTH / RESCALE) + x] = proportion;
+        }
+    }
+}
 
 // Draw normalized average pixel values from paddle on frame
 
-pub fn draw_scaled_paddle(scaled_frame: &mut [f64; EXPORT_LEN], pos: Point) {}
+pub fn draw_scaled_paddle(scaled_frame: &mut [f64; EXPORT_LEN], pos: Point) {
+    // Calculate range of scaled pixels that overlap the paddle
+
+    let x_range = (pos.0 / RESCALE, {
+        let max_x = pos.0 + PADDLE_WIDTH;
+        max_x.div_ceil(RESCALE).saturating_sub(1)
+    });
+    let y_range = (pos.1 / RESCALE, {
+        let max_y = pos.1 + PADDLE_HEIGHT;
+        max_y.div_ceil(RESCALE).saturating_sub(1)
+    });
+
+    for x in x_range.0..x_range.1 + 1 {
+        for y in y_range.0..y_range.1 + 1 {
+            // Calculate paddle overlap area for each rescaled pixel
+
+            let frame_pos = (x * RESCALE, y * RESCALE);
+            let mut width = RESCALE;
+            if frame_pos.0 < pos.0 {
+                width -= pos.0 - frame_pos.0;
+            }
+            if frame_pos.0 + RESCALE > pos.0 + PADDLE_WIDTH {
+                width -= (frame_pos.0 + RESCALE) - (pos.0 + PADDLE_WIDTH);
+            }
+            let mut height = RESCALE;
+            if frame_pos.1 < pos.1 {
+                height -= pos.1 - frame_pos.1;
+            }
+            if frame_pos.1 + RESCALE > pos.1 + PADDLE_HEIGHT {
+                height -= (frame_pos.1 + RESCALE) - (pos.1 + PADDLE_HEIGHT);
+            }
+
+            let proportion = (width * height) as f64 / (RESCALE * RESCALE) as f64;
+            scaled_frame[y * (WIDTH / RESCALE) + x] = proportion;
+        }
+    }
+}
 
 // Calculate pixel colors for ball subpixel rendering
 

@@ -72,8 +72,8 @@ impl PongEnv {
             &[
                 ((state[0] + BALL_SIZE as f64 / 2.0) / WIDTH as f64 - 0.5) * 2.0, // Ball x position
                 ((state[1] + BALL_SIZE as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Ball y position
-                state[2] / BALL_SPEED as f64, // Ball x velocity
-                state[3] / BALL_SPEED as f64, // Ball y velocity
+                state[2] / BALL_SPEED, // Ball x velocity
+                state[3] / BALL_SPEED, // Ball y velocity
                 ((state[4] + PADDLE_HEIGHT as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Left paddle y position
                 ((state[5] + PADDLE_HEIGHT as f64 / 2.0) / HEIGHT as f64 - 0.5) * 2.0, // Right paddle y position
             ],

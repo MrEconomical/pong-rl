@@ -3,7 +3,6 @@ use crate::config::{
     BALL_SIZE, BORDER, COLOR, EXPORT_LEN, HEIGHT, PADDLE_HEIGHT, PADDLE_WIDTH, RESCALE,
     TOTAL_HEIGHT, TOTAL_WIDTH, WIDTH,
 };
-use std::cmp;
 
 // Draw ball on Pixels RGBA frame at position with subpixel rendering
 
@@ -61,11 +60,11 @@ pub fn draw_scaled_ball(scaled_frame: &mut [f64; EXPORT_LEN], pos: FloatPoint) {
     // Calculate range of scaled pixels that overlap the ball
 
     let x_range = (pos.0.floor() as usize / RESCALE, {
-        let max_x = cmp::min(pos.0.ceil() as usize + BALL_SIZE, WIDTH);
+        let max_x = (pos.0.ceil() as usize + BALL_SIZE).min(WIDTH);
         max_x.div_ceil(RESCALE).saturating_sub(1)
     });
     let y_range = (pos.1.floor() as usize / RESCALE, {
-        let max_y = cmp::min(pos.1.ceil() as usize + BALL_SIZE, HEIGHT);
+        let max_y = (pos.1.ceil() as usize + BALL_SIZE).min(HEIGHT);
         max_y.div_ceil(RESCALE).saturating_sub(1)
     });
 

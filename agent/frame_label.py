@@ -1,4 +1,4 @@
-# labeled learning with full state of Pong environment
+# labeled learning with Pong frame data
 
 from models.mse_model import Model
 import numpy as np
@@ -6,12 +6,12 @@ import pong_rl
 
 # create or load model
 
-load_model = False
-checkpoint = 0
+load_model = True
+checkpoint = 1
 
 model = None
 if load_model:
-    model = Model.from_save("agent/saved_models/state_label/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/saved_models/frame_label/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -20,9 +20,9 @@ if load_model:
     ))
 else:
     model = Model.with_random_weights(
-        6, # input size
-        20, # hidden size
-        0.01, # learning rate
+        6000, # input size
+        50, # hidden size
+        0.001, # learning rate
     )
     print("created new model with parameters ({}, {}, {})".format(
         model.input_size,
@@ -52,7 +52,8 @@ while True:
         # predict action
 
         game_state = pong.get_normalized_state()
-        hidden_output, action_prob = model.forward(game_state)
+        frame_state = pong.get_normalized_frame()
+        hidden_output, action_prob = model.forward(frame_state)
         action = 1 if np.random.uniform() < action_prob else 0
 
         # calculate correct action
@@ -65,7 +66,7 @@ while True:
 
         # store action data and get reward
 
-        episode_states.append(game_state)
+        episode_states.append(frame_state)
         episode_hidden_outputs.append(hidden_output)
         episode_probs.append(action_prob)
         episode_labels.append(correct_action)
@@ -90,8 +91,8 @@ while True:
 
     pong.reset()
 
-    if episode_num % 500 == 0:
+    if episode_num % 200 == 0:
         print("FINISHED EPISODE:", episode_num)
         print("wins and losses:", wins, losses)
         checkpoint += 1
-        model.save("agent/saved_models/state_label/" + str(checkpoint) + ".json")
+        model.save("agent/saved_models/frame_label/" + str(checkpoint) + ".json")

@@ -1,4 +1,4 @@
 target
 venv
-agent/__pycache__
+agent/models/__pycache__
 agent/saved_models

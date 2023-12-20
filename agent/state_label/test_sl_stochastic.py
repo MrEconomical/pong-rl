@@ -1,5 +1,5 @@
 '''
-test script for models
+test stochastic state label model
 '''
 
 from pathlib import Path
@@ -29,6 +29,6 @@ while True:
     while reward == 0:
         game_state = pong.get_normalized_state()
         h, action_prob = model.forward(game_state)
-        action = 1 if np.random.uniform() < action_prob else 0
+        action = 1 if np.random.uniform() < action_prob[0] else 0
         reward = pong.tick(action)
     pong.reset()

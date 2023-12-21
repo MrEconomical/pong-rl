@@ -26,9 +26,14 @@ pong.start()
 
 while True:
     reward = 0
+    
     while reward == 0:
         game_state = pong.get_normalized_state()
         h, action_prob = model.forward(game_state)
         action = 1 if np.random.uniform() < action_prob[0] else 0
+
         reward = pong.tick(action)
+        if reward == 0:
+            reward = pong.tick(action)
+    
     pong.reset()

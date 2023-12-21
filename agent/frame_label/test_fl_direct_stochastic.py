@@ -1,5 +1,5 @@
 '''
-test stochastic state label model
+test stochastic frame label model
 '''
 
 from pathlib import Path
@@ -10,9 +10,9 @@ from models.stochastic_model import Model
 import numpy as np
 import pong_rl
 
-checkpoint = 8
-save_folder = "stochastic_models"
-model = Model.from_save("agent/state_label/" + save_folder + "/" + str(checkpoint) + ".json")
+checkpoint = 6
+save_folder = "direct_stochastic_models"
+model = Model.from_save("agent/frame_label/" + save_folder + "/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}) from checkpoint {}".format(
     model.input_size,
     model.hidden_size,
@@ -28,12 +28,12 @@ while True:
     reward = 0
 
     while reward == 0:
-        game_state = pong.get_normalized_state()
-        h, action_prob = model.forward(game_state)
+        current_frame = pong.get_normalized_frame()
+        h, action_prob = model.forward(current_frame)
         action = 1 if np.random.uniform() < action_prob[0] else 0
 
         reward = pong.tick(action)
-        if reward == 0:
+        if reward != 0:
             reward = pong.tick(action)
     
     pong.reset()

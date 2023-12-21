@@ -1,5 +1,8 @@
 agent/state_label/stochastic_models
 agent/state_label/batch_models
+agent/frame_label/direct_stochastic_models
+agent/frame_label/stochastic_models
+agent/frame_label/batch_models
 __pycache__
 target
 venv

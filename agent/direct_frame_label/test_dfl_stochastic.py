@@ -10,9 +10,9 @@ from models.stochastic_model import Model
 import numpy as np
 import pong_rl
 
-checkpoint = 6
-save_folder = "direct_stochastic_models"
-model = Model.from_save("agent/frame_label/" + save_folder + "/" + str(checkpoint) + ".json")
+checkpoint = 5
+save_folder = "stochastic_models"
+model = Model.from_save("agent/direct_frame_label/" + save_folder + "/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}) from checkpoint {}".format(
     model.input_size,
     model.hidden_size,
@@ -33,7 +33,7 @@ while True:
         action = 1 if np.random.uniform() < action_prob[0] else 0
 
         reward = pong.tick(action)
-        if reward != 0:
+        if reward == 0:
             reward = pong.tick(action)
     
     pong.reset()

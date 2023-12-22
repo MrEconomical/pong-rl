@@ -17,7 +17,7 @@ checkpoint = 0
 
 model = None
 if load_model:
-    model = Model.from_save("agent/frame_label/direct_stochastic_models/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/direct_frame_label/stochastic_models/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -114,5 +114,5 @@ while True:
     
     if episode_num % 500 == 0:
         checkpoint += 1
-        model.save("agent/frame_label/direct_stochastic_models/" + str(checkpoint) + ".json")
+        model.save("agent/direct_frame_label/stochastic_models/" + str(checkpoint) + ".json")
         

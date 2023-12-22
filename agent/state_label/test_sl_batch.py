@@ -1,5 +1,5 @@
 '''
-test batch state label model
+test state label batch model
 '''
 
 from pathlib import Path

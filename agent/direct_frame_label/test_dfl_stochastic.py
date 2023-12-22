@@ -1,5 +1,5 @@
 '''
-test stochastic frame label model
+test direct frame label stochastic model
 '''
 
 from pathlib import Path

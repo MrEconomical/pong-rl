@@ -62,7 +62,7 @@ buffer_len = 20000
 buffer_index = 0
 
 batch_size = 64
-explore_decay = 0.999
+explore_decay = 0.995
 
 while True:
     # initialize episode data
@@ -77,7 +77,7 @@ while True:
 
         action = None
         if np.random.uniform() < model.explore_factor:
-            action = 1 if np.random.uniform() < 0.5 else 0
+            action = 0 if np.random.uniform() < 0.5 else 1
         else:
             h, action_values = model.forward(game_state)
             action = 0 if action_values[0] >= action_values[1] else 1

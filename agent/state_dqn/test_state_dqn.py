@@ -7,10 +7,9 @@ import sys
 sys.path.insert(0, str(Path(Path(__file__).parent.absolute()).parent.absolute()))
 
 from models.dqn_model import Model
-import numpy as np
 import pong_rl
 
-checkpoint = 8
+checkpoint = 6
 save_folder = "dqn_models"
 model = Model.from_save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}, {}, {}) from checkpoint {}".format(

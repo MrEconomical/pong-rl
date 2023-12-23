@@ -1,7 +1,7 @@
 '''
 Deep Q-Network mean squared error model class with 1 hidden layer and 1 output
-layer using relu for the hidden layer and sigmoid for the output layer with
-batched gradient updates
+layer using relu for the hidden layer and linear activation for the output layer
+with batched gradient updates
 '''
 
 import json
@@ -33,7 +33,7 @@ class Model:
         hidden_weights[:, -1] = 0
 
         output_weights = np.empty((output_size, hidden_size + 1))
-        output_weights[:, :-1] = np.random.randn(output_size, hidden_size) * np.sqrt(1 / hidden_size) # Xavier initialization
+        output_weights[:, :-1] = np.random.randn(output_size, hidden_size) * np.sqrt(2 / hidden_size) # He initialization
         output_weights[:, -1] = 0
 
         return self(
@@ -72,16 +72,15 @@ class Model:
         hidden_output = np.dot(self.weights[0][:, :-1], input_data) + self.weights[0][:, -1]
         np.maximum(hidden_output, 0, out=hidden_output) # relu activation
         output = np.dot(self.weights[1][:, :-1], hidden_output) + self.weights[1][:, -1]
-        output = 1 / (1 + np.exp(-output)) # sigmoid activation
 
         return hidden_output, output
 
     # calculate gradients with back propagation
 
     def back_prop(self, input_data, hidden_output, output, expected):
-        # calculate gradients for output neuron using sigmoid derivative
+        # calculate gradients for output neuron using linear derivative
 
-        output_deltas = (output - expected) * (output * (1 - output)) # using sigmoid derivative
+        output_deltas = output - expected # using linear derivative
         output_gradients = np.empty((self.output_size, self.hidden_size + 1))
         output_gradients[:, :-1] = np.outer(output_deltas, hidden_output) # set output weight derivatives
         output_gradients[:, -1:] = np.reshape(output_deltas, (self.output_size, 1)) # bias is a fixed input of 1

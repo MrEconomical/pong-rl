@@ -31,11 +31,11 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        40, # hidden size
+        30, # hidden size
         2, # output size
-        0.005, # learning rate
-        0.98, # discount rate
-        0.8, # explore factor
+        0.0001, # learning rate
+        0.99, # discount rate
+        1, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
         model.input_size,
@@ -55,14 +55,15 @@ losses = 0
 # initialize training data
 
 target_model = copy.deepcopy(model)
-sync_interval = 200
+sync_interval = 100
 
 transitions = []
 buffer_len = 20000
 buffer_index = 0
 
 batch_size = 64
-explore_decay = 0.995
+explore_decay = 0.999
+min_explore = 0.05
 
 while True:
     # initialize episode data
@@ -111,23 +112,26 @@ while True:
         wins += 1
     
     # train using random transitions from replay buffer
-    
+
     train_sample = random.sample(transitions, min(batch_size, len(transitions)))
     hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
     output_batch = np.zeros((model.output_size, model.hidden_size + 1))
     total_error = 0
 
     for transition in train_sample:
-        # calculate target values using target model
+        # calculate target value using target model
 
-        target_values = np.full(2, transition[2], dtype=np.float64)
+        target_value = final_reward
         if not (transition[3] is None):
             h, action_values = target_model.forward(transition[3])
-            target_values += model.discount_rate * action_values
+            best_value = max(action_values[0], action_values[1])
+            target_value += model.discount_rate * best_value
 
-        # back propgate target values through model
+        # back propagate target values through model
         
         hidden_output, predicted_values = model.forward(transition[0])
+        target_values = np.copy(predicted_values)
+        target_values[transition[1]] = target_value
         hidden_grad, output_grad, error = model.back_prop(
             action,
             hidden_output,
@@ -144,7 +148,8 @@ while True:
     # update target model
 
     if episode_num % sync_interval == 0:
-        model.explore_factor *= explore_decay
+        if model.explore_factor > min_explore:
+            model.explore_factor *= explore_decay
         target_model = copy.deepcopy(model)
     
     # reset game environment

@@ -118,19 +118,16 @@ while True:
     total_error = 0
 
     for transition in train_sample:
-        # calculate target value using target model
+        # calculate target values using target model
 
-        target_value = transition[2]
+        target_values = np.full(2, transition[2], dtype=np.float64)
         if not (transition[3] is None):
             h, action_values = target_model.forward(transition[3])
-            best_value = max(action_values[0], action_values[1])
-            target_value += model.discount_rate * best_value
+            target_values += model.discount_rate * action_values
 
-        # back propgate target value through model
+        # back propgate target values through model
         
         hidden_output, predicted_values = model.forward(transition[0])
-        target_values = np.copy(predicted_values)
-        target_values[transition[1]] = target_value
         hidden_grad, output_grad, error = model.back_prop(
             action,
             hidden_output,

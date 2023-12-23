@@ -6,9 +6,11 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(Path(__file__).parent.absolute()).parent.absolute()))
 
+import copy
 from models.dqn_model import Model
 import numpy as np
 import pong_rl
+import random
 
 # create or load model
 
@@ -28,11 +30,11 @@ if load_model:
     ))
 else:
     model = Model.with_random_weights(
-        7, # input size
+        6, # input size
         40, # hidden size
-        1, # output size
-        0.001, # learning rate
-        0.99, # discount rate
+        2, # output size
+        0.005, # learning rate
+        0.98, # discount rate
         0.8, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
@@ -45,14 +47,21 @@ else:
 
 # create Pong environment
 
-pong = pong_rl.PongEnv.with_render()
+pong = pong_rl.PongEnv.without_render()
 episode_num = 0
 wins = 0
 losses = 0
 
+# initialize training data
+
+target_model = copy.deepcopy(model)
+sync_interval = 200
+
 transitions = []
-buffer_len = 10000
+buffer_len = 20000
 buffer_index = 0
+
+batch_size = 64
 explore_decay = 0.999
 
 while True:
@@ -70,12 +79,11 @@ while True:
         if np.random.uniform() < model.explore_factor:
             action = 1 if np.random.uniform() < 0.5 else 0
         else:
-            h, up_value = model.forward(np.append(game_state, 1))
-            h, down_value = model.forward(np.append(game_state, 0))
-            action = 1 if up_value[0] >= down_value[0] else 0
+            h, action_values = model.forward(game_state)
+            action = 0 if action_values[0] >= action_values[1] else 1
         
         # advance game state
-            
+        
         final_reward = pong.tick(action)
         if final_reward == 0:
             final_reward = pong.tick(action)
@@ -95,7 +103,65 @@ while True:
             transitions[buffer_index] = transition
             buffer_index = (buffer_index + 1) % buffer_len
     
-    # sample state transitions from replay buffer
-            
-    print(transitions)
-    break
+    # update stats counter
+    
+    if final_reward == -1:
+        losses += 1
+    else:
+        wins += 1
+    
+    # train using random transitions from replay buffer
+    
+    train_sample = random.sample(transitions, min(batch_size, len(transitions)))
+    hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
+    output_batch = np.zeros((model.output_size, model.hidden_size + 1))
+    total_error = 0
+
+    for transition in train_sample:
+        # calculate target value using target model
+
+        target_value = transition[2]
+        if not (transition[3] is None):
+            h, action_values = target_model.forward(transition[3])
+            best_value = max(action_values[0], action_values[1])
+            target_value += model.discount_rate * best_value
+
+        # back propgate target value through model
+        
+        hidden_output, predicted_values = model.forward(transition[0])
+        target_values = np.copy(predicted_values)
+        target_values[transition[1]] = target_value
+        hidden_grad, output_grad, error = model.back_prop(
+            action,
+            hidden_output,
+            predicted_values,
+            target_values
+        )
+
+        hidden_batch += hidden_grad
+        output_batch += output_grad
+        total_error += error
+    
+    model.apply_gradients(hidden_batch, output_batch)
+
+    # update target model
+
+    if episode_num % sync_interval == 0:
+        model.explore_factor *= explore_decay
+        target_model = copy.deepcopy(model)
+    
+    # reset game environment
+        
+    pong.reset()
+    
+    if episode_num % 5000 == 0:
+        print("FINISHED EPISODE:", episode_num)
+        print("wins and losses:", wins, losses)
+        print("average error:", total_error / len(train_sample))
+
+        wins = 0
+        losses = 0
+    
+    if episode_num % 20000 == 0:
+        checkpoint += 1
+        model.save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")

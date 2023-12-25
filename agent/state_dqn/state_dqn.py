@@ -31,10 +31,10 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        30, # hidden size
+        40, # hidden size
         2, # output size
-        0.0001, # learning rate
-        0.99, # discount rate
+        0.001, # learning rate
+        0.98, # discount rate
         1, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
@@ -61,8 +61,8 @@ transitions = []
 buffer_len = 20000
 buffer_index = 0
 
-batch_size = 64
-explore_decay = 0.999
+batch_size = 32
+explore_decay = 0.998
 min_explore = 0.05
 
 while True:
@@ -100,9 +100,47 @@ while True:
         
         if len(transitions) < buffer_len:
             transitions.append(transition)
+            continue
         else:
             transitions[buffer_index] = transition
             buffer_index = (buffer_index + 1) % buffer_len
+        
+        # train using random transitions from replay buffer
+
+        train_sample = random.sample(transitions, batch_size)
+        hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
+        output_batch = np.zeros((model.output_size, model.hidden_size + 1))
+        total_error = 0
+
+        for transition in train_sample:
+            # calculate target value using target model
+
+            target_value = final_reward
+            if not (transition[3] is None):
+                h, action_values = target_model.forward(transition[3])
+                best_value = max(action_values[0], action_values[1])
+                target_value += model.discount_rate * best_value
+
+            # back propagate target values through model
+            
+            hidden_output, predicted_values = model.forward(transition[0])
+            target_values = np.copy(predicted_values)
+            target_values[transition[1]] = target_value
+            hidden_grad, output_grad, error = model.back_prop(
+                action,
+                hidden_output,
+                predicted_values,
+                target_values
+            )
+
+            if np.random.uniform() < 0.00001:
+                print("predict:", predicted_values, "target:", target_values)
+
+            hidden_batch += hidden_grad
+            output_batch += output_grad
+            total_error += error
+        
+        model.apply_gradients(hidden_batch, output_batch)
     
     # update stats counter
     
@@ -110,40 +148,6 @@ while True:
         losses += 1
     else:
         wins += 1
-    
-    # train using random transitions from replay buffer
-
-    train_sample = random.sample(transitions, min(batch_size, len(transitions)))
-    hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
-    output_batch = np.zeros((model.output_size, model.hidden_size + 1))
-    total_error = 0
-
-    for transition in train_sample:
-        # calculate target value using target model
-
-        target_value = final_reward
-        if not (transition[3] is None):
-            h, action_values = target_model.forward(transition[3])
-            best_value = max(action_values[0], action_values[1])
-            target_value += model.discount_rate * best_value
-
-        # back propagate target values through model
-        
-        hidden_output, predicted_values = model.forward(transition[0])
-        target_values = np.copy(predicted_values)
-        target_values[transition[1]] = target_value
-        hidden_grad, output_grad, error = model.back_prop(
-            action,
-            hidden_output,
-            predicted_values,
-            target_values
-        )
-
-        hidden_batch += hidden_grad
-        output_batch += output_grad
-        total_error += error
-    
-    model.apply_gradients(hidden_batch, output_batch)
 
     # update target model
 
@@ -156,14 +160,14 @@ while True:
         
     pong.reset()
     
-    if episode_num % 5000 == 0:
+    if episode_num % 1000 == 0:
         print("FINISHED EPISODE:", episode_num)
         print("wins and losses:", wins, losses)
-        print("average error:", total_error / len(train_sample))
+        print("explore factor:", model.explore_factor)
 
         wins = 0
         losses = 0
     
-    if episode_num % 20000 == 0:
+    if episode_num % 5000 == 0:
         checkpoint += 1
         model.save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")

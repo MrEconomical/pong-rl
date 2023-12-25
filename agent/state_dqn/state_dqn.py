@@ -55,15 +55,15 @@ losses = 0
 # initialize training data
 
 target_model = copy.deepcopy(model)
-sync_interval = 100
+sync_interval = 10
 
 transitions = []
-buffer_len = 20000
+buffer_len = 50000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.998
-min_explore = 0.05
+explore_decay = 0.999
+min_explore = 0.1
 
 while True:
     # initialize episode data
@@ -115,7 +115,7 @@ while True:
         for transition in train_sample:
             # calculate target value using target model
 
-            target_value = final_reward
+            target_value = transition[2]
             if not (transition[3] is None):
                 h, action_values = target_model.forward(transition[3])
                 best_value = max(action_values[0], action_values[1])

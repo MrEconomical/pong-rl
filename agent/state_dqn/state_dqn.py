@@ -31,7 +31,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        40, # hidden size
+        80, # hidden size
         2, # output size
         0.001, # learning rate
         0.98, # discount rate
@@ -58,11 +58,11 @@ target_model = copy.deepcopy(model)
 sync_interval = 10
 
 transitions = []
-buffer_len = 50000
+buffer_len = 30000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.999
+explore_decay = 0.9993
 min_explore = 0.1
 
 while True:
@@ -134,6 +134,7 @@ while True:
             )
 
             if np.random.uniform() < 0.00001:
+                print("target:", transition[2], target_value)
                 print("predict:", predicted_values, "target:", target_values)
 
             hidden_batch += hidden_grad
@@ -168,6 +169,6 @@ while True:
         wins = 0
         losses = 0
     
-    if episode_num % 5000 == 0:
+    if episode_num % 3000 == 0:
         checkpoint += 1
         model.save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")

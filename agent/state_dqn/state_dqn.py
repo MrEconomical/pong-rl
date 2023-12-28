@@ -31,10 +31,10 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        80, # hidden size
+        200, # hidden size
         2, # output size
-        0.001, # learning rate
-        0.98, # discount rate
+        0.0005, # learning rate
+        0.99, # discount rate
         1, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
@@ -55,14 +55,14 @@ losses = 0
 # initialize training data
 
 target_model = copy.deepcopy(model)
-sync_interval = 10
+sync_interval = 12
 
 transitions = []
 buffer_len = 30000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9993
+explore_decay = 0.9996
 min_explore = 0.1
 
 while True:

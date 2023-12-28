@@ -97,6 +97,7 @@ while True:
             transition = (game_state, action, final_reward, next_state)
         else:
             transition = (game_state, action, final_reward, None)
+        game_state = next_state
         
         if len(transitions) < buffer_len:
             transitions.append(transition)
@@ -134,8 +135,11 @@ while True:
             )
 
             if np.random.uniform() < 0.00001:
+                #print("transition:", transition[0], transition[1], transition[2], transition[3])
+                #print("forward:", action_values)
                 print("target:", transition[2], target_value)
                 print("predict:", predicted_values, "target:", target_values)
+                #print()
 
             hidden_batch += hidden_grad
             output_batch += output_grad

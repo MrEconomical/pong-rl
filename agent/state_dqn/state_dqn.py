@@ -31,9 +31,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        200, # hidden size
+        250, # hidden size
         2, # output size
-        0.0005, # learning rate
+        0.001, # learning rate
         0.99, # discount rate
         1, # explore factor
     )
@@ -58,7 +58,7 @@ target_model = copy.deepcopy(model)
 sync_interval = 12
 
 transitions = []
-buffer_len = 30000
+buffer_len = 50000
 buffer_index = 0
 
 batch_size = 32

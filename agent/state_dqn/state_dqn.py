@@ -14,8 +14,8 @@ import random
 
 # create or load model
 
-load_model = False
-checkpoint = 0
+load_model = True
+checkpoint = 1
 
 model = None
 if load_model:
@@ -62,7 +62,7 @@ buffer_len = 50000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9996
+explore_decay = 0.9994
 min_explore = 0.1
 
 while True:

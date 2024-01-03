@@ -14,8 +14,8 @@ import random
 
 # create or load model
 
-load_model = True
-checkpoint = 1
+load_model = False
+checkpoint = 0
 
 model = None
 if load_model:
@@ -31,10 +31,10 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        250, # hidden size
+        400, # hidden size
         2, # output size
         0.001, # learning rate
-        0.99, # discount rate
+        0.992, # discount rate
         1, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
@@ -58,7 +58,7 @@ target_model = copy.deepcopy(model)
 sync_interval = 12
 
 transitions = []
-buffer_len = 50000
+buffer_len = 80000
 buffer_index = 0
 
 batch_size = 32

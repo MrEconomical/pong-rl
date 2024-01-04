@@ -58,7 +58,7 @@ target_model = copy.deepcopy(model)
 sync_interval = 12
 
 transitions = []
-buffer_len = 50000
+buffer_len = 80000
 buffer_index = 0
 
 batch_size = 32
@@ -86,8 +86,6 @@ while True:
         # advance game state
         
         final_reward = pong.tick(action)
-        if final_reward == 0:
-            final_reward = pong.tick(action)
         if final_reward == 0:
             final_reward = pong.tick(action)
         next_state = pong.get_normalized_state()

@@ -31,7 +31,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        400, # hidden size
+        300, # hidden size
         2, # output size
         0.001, # learning rate
         0.992, # discount rate
@@ -86,6 +86,8 @@ while True:
         # advance game state
         
         final_reward = pong.tick(action)
+        if final_reward == 0:
+            final_reward = pong.tick(action)
         if final_reward == 0:
             final_reward = pong.tick(action)
         next_state = pong.get_normalized_state()

@@ -1,5 +1,6 @@
 '''
-Deep Q-Network learning with full state of Pong environment
+Deep Q-Network learning with full state of Pong environment with an artifical
+reward for hitting the ball
 '''
 
 from pathlib import Path
@@ -19,7 +20,7 @@ checkpoint = 0
 
 model = None
 if load_model:
-    model = Model.from_save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/state_hit_dqn/dqn_models/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -31,10 +32,10 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        300, # hidden size
+        250, # hidden size
         2, # output size
         0.001, # learning rate
-        0.992, # discount rate
+        0.98, # discount rate
         1, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
@@ -58,11 +59,11 @@ target_model = copy.deepcopy(model)
 sync_interval = 12
 
 transitions = []
-buffer_len = 80000
+buffer_len = 40000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9994
+explore_decay = 0.9992
 min_explore = 0.1
 
 while True:
@@ -85,9 +86,19 @@ while True:
         
         # advance game state
         
+        prev_velocity = pong.get_normalized_state()[2]
         final_reward = pong.tick(action)
+
         if final_reward == 0:
-            final_reward = pong.tick(action)
+            if prev_velocity < 0 and pong.get_normalized_state()[2] > 0:
+                final_reward = 1
+            else:
+                prev_velocity = pong.get_normalized_state()[2]
+                final_reward = pong.tick(action)
+                if final_reward == 0:
+                    if prev_velocity < 0 and pong.get_normalized_state()[2] > 0:
+                        final_reward = 1
+        
         next_state = pong.get_normalized_state()
 
         # store state transition
@@ -175,4 +186,4 @@ while True:
     
     if episode_num % 3000 == 0:
         checkpoint += 1
-        model.save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")
+        model.save("agent/state_hit_dqn/dqn_models/" + str(checkpoint) + ".json")

@@ -1,5 +1,5 @@
 '''
-test state Deep Q-Network model
+test state Deep Q-Network ball hit model
 '''
 
 from pathlib import Path
@@ -9,9 +9,9 @@ sys.path.insert(0, str(Path(Path(__file__).parent.absolute()).parent.absolute())
 from models.dqn_model import Model
 import pong_rl
 
-checkpoint = 1
+checkpoint = 4
 save_folder = "dqn_models"
-model = Model.from_save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
+model = Model.from_save("agent/state_hit_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}, {}, {}) from checkpoint {}".format(
     model.input_size,
     model.hidden_size,

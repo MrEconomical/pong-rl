@@ -11,7 +11,7 @@ pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
     #[allow(clippy::needless_range_loop)]
     for row in 0..BALL_SIZE + 1 {
         let row_offset = start_pos.1 + row + BORDER;
-        if row_offset == TOTAL_HEIGHT - BORDER {
+        if row_offset >= TOTAL_HEIGHT - BORDER {
             continue;
         }
         for col in 0..BALL_SIZE + 1 {

@@ -32,7 +32,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        100, # hidden size
+        50, # hidden size
         2, # output size
         0.001, # learning rate
         0.99, # discount rate

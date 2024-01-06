@@ -14,8 +14,8 @@ import random
 
 # create or load model
 
-load_model = False
-checkpoint = 0
+load_model = True
+checkpoint = 5
 
 model = None
 if load_model:
@@ -133,10 +133,6 @@ while True:
                 predicted_values,
                 target_values
             )
-
-            if np.random.uniform() < 0.00001:
-                print("target:", transition[2], target_value)
-                print("predict:", predicted_values, "target:", target_values)
 
             hidden_batch += hidden_grad
             output_batch += output_grad

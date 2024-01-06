@@ -32,10 +32,10 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        250, # hidden size
+        100, # hidden size
         2, # output size
         0.001, # learning rate
-        0.98, # discount rate
+        0.99, # discount rate
         1, # explore factor
     )
     print("created new model with parameters ({}, {}, {}, {}, {})".format(
@@ -59,11 +59,11 @@ target_model = copy.deepcopy(model)
 sync_interval = 12
 
 transitions = []
-buffer_len = 40000
+buffer_len = 50000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9992
+explore_decay = 0.997
 min_explore = 0.1
 
 while True:
@@ -84,7 +84,7 @@ while True:
             h, action_values = model.forward(game_state)
             action = 0 if action_values[0] >= action_values[1] else 1
         
-        # advance game state
+        # advance game state and add artificial reward
         
         prev_velocity = pong.get_normalized_state()[2]
         final_reward = pong.tick(action)
@@ -139,18 +139,15 @@ while True:
             target_values = np.copy(predicted_values)
             target_values[transition[1]] = target_value
             hidden_grad, output_grad, error = model.back_prop(
-                action,
+                transition[0],
                 hidden_output,
                 predicted_values,
                 target_values
             )
 
             if np.random.uniform() < 0.00001:
-                #print("transition:", transition[0], transition[1], transition[2], transition[3])
-                #print("forward:", action_values)
                 print("target:", transition[2], target_value)
                 print("predict:", predicted_values, "target:", target_values)
-                #print()
 
             hidden_batch += hidden_grad
             output_batch += output_grad
@@ -184,6 +181,6 @@ while True:
         wins = 0
         losses = 0
     
-    if episode_num % 3000 == 0:
+    if episode_num % 2000 == 0:
         checkpoint += 1
         model.save("agent/state_hit_dqn/dqn_models/" + str(checkpoint) + ".json")

@@ -47,7 +47,7 @@ else:
 
 # create Pong environment
 
-pong = pong_rl.PongEnv.with_render()
+pong = pong_rl.PongEnv.without_render()
 episode_num = 0
 wins = 0
 losses = 0

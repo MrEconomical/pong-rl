@@ -59,7 +59,7 @@ target_model = copy.deepcopy(model)
 sync_interval = 8
 
 transitions = []
-buffer_len = 50000
+buffer_len = 40000
 buffer_index = 0
 
 batch_size = 32

@@ -56,7 +56,7 @@ losses = 0
 # initialize training data
 
 target_model = copy.deepcopy(model)
-sync_interval = 10
+sync_interval = 8
 
 transitions = []
 buffer_len = 50000

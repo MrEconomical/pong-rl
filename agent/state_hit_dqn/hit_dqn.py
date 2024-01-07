@@ -145,10 +145,6 @@ while True:
                 target_values
             )
 
-            if np.random.uniform() < 0.00001:
-                print("target:", transition[2], target_value)
-                print("predict:", predicted_values, "target:", target_values)
-
             hidden_batch += hidden_grad
             output_batch += output_grad
             total_error += error

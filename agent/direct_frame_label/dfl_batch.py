@@ -117,7 +117,6 @@ while True:
         print("FINISHED EPISODE:", episode_num)
         print("wins and losses:", wins, losses)
         print("average error:", total_error / len(episode_states))
-        print("len:", len(episode_states))
         wins = 0
         losses = 0
     

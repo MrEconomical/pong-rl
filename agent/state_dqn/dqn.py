@@ -14,8 +14,8 @@ import random
 
 # create or load model
 
-load_model = True
-checkpoint = 5
+load_model = False
+checkpoint = 0
 
 model = None
 if load_model:
@@ -31,7 +31,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        100, # hidden size
+        200, # hidden size
         2, # output size
         0.001, # learning rate
         0.99, # discount rate

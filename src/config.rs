@@ -11,7 +11,7 @@ pub const MAX_INITIAL_ANGLE: f64 = 40.0;
 
 pub const PADDLE_WIDTH: usize = 10;
 pub const PADDLE_HEIGHT: usize = 80;
-pub const PADDLE_SPEED: usize = 7;
+pub const PADDLE_SPEED: usize = 6;
 pub const PADDLE_OFFSET: usize = 12;
 
 pub const COLOR: u8 = 0xFF;

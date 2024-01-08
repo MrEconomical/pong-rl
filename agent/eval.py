@@ -3,10 +3,17 @@ evaluate model performance in Pong environment
 '''
 
 '''
-5 trials of 1000 games (with frame skipping)
+5 trials of 100 games (with frame skipping)
 results:
-state label stochastic checkpoint 8: 50.56 ± 1.61
-state label batch checkpoint 8: 49.52 ± 1.12
+state label stochastic checkpoint 8: 50.60 ± 3.72
+state label batch checkpoint 8: 53 ± 2.9
+direct frame label stochastic checkpoint 8:
+direct frame label batch checkpoint 8:
+state hit dqn checkpoint 8:
+'''
+
+'''
+state dqn checkpoint 24:
 '''
 
 from models.stochastic_model import Model as StochasticModel
@@ -36,7 +43,7 @@ pong = pong_rl.PongEnv.without_render()
 pong.start()
 
 num_trials = 5
-trial_len = 1000
+trial_len = 100
 records = []
 
 for t in range(num_trials):
@@ -79,6 +86,7 @@ for t in range(num_trials):
             record[1] += 1
     
     records.append(record)
+    print("finished trial:", t + 1)
 
 # process results
 

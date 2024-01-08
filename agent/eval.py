@@ -6,10 +6,10 @@ evaluate model performance in Pong environment
 5 trials of 100 games (with frame skipping)
 results:
 state label stochastic checkpoint 8: 50.60 ± 3.72
-state label batch checkpoint 8: 53 ± 2.9
-direct frame label stochastic checkpoint 8:
-direct frame label batch checkpoint 8:
-state hit dqn checkpoint 8:
+state label batch checkpoint 8: 53.00 ± 2.90
+direct frame label stochastic checkpoint 8: 52.60 ± 5.04
+direct frame label batch checkpoint 8: 55.8 ± 5.88
+state hit dqn checkpoint 8: 85.40 ± 1.50
 '''
 
 '''
@@ -25,8 +25,8 @@ import pong_rl
 # test parameters
 
 Model = StochasticModel
-model_type = "state_label"
-file_path = "agent/state_label/batch_models/8.json"
+model_type = "state_dqn"
+file_path = "agent/state_hit_dqn/dqn_models/8.json"
 
 # load model from file
 

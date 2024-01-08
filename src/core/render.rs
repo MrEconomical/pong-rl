@@ -15,7 +15,11 @@ pub fn draw_ball(rgba_frame: &mut [u8], pos: FloatPoint, color: u8) {
             continue;
         }
         for col in 0..BALL_SIZE + 1 {
-            let offset = (row_offset * TOTAL_WIDTH + start_pos.0 + col + BORDER) * 4;
+            let col_offset = start_pos.0 + col + BORDER;
+            if col_offset >= TOTAL_WIDTH - BORDER {
+                continue;
+            }
+            let offset = (row_offset * TOTAL_WIDTH + col_offset) * 4;
             set_rgba_color(rgba_frame, offset, ball_pixels[row][col]);
         }
     }

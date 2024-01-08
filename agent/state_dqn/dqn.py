@@ -62,7 +62,7 @@ buffer_len = 80000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9995
+explore_decay = 0.9997
 min_explore = 0.1
 
 while True:

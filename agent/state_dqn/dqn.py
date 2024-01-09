@@ -14,12 +14,14 @@ import random
 
 # create or load model
 
+save_folder = "dqn_models_300_9994_2"
 load_model = False
 checkpoint = 0
+print("save folder: " + save_folder)
 
 model = None
 if load_model:
-    model = Model.from_save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -111,7 +113,6 @@ while True:
         train_sample = random.sample(transitions, batch_size)
         hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
-        total_error = 0
 
         # batch calculate target values using target model
 
@@ -139,7 +140,6 @@ while True:
 
             hidden_batch += hidden_grad
             output_batch += output_grad
-            total_error += error
         
         model.apply_gradients(hidden_batch, output_batch)
     
@@ -169,6 +169,6 @@ while True:
         wins = 0
         losses = 0
     
-    if episode_num % 3000 == 0:
+    if episode_num % 2000 == 0:
         checkpoint += 1
-        model.save("agent/state_dqn/dqn_models/" + str(checkpoint) + ".json")
+        model.save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")

@@ -10,7 +10,7 @@ state label batch checkpoint 8: 53.00 ± 2.90
 direct frame label stochastic checkpoint 8: 52.60 ± 5.04
 direct frame label batch checkpoint 8: 55.8 ± 5.88
 state hit dqn checkpoint 8: 85.40 ± 1.50
-state dqn checkpoint 10: 96.60 ± 1.74
+state dqn checkpoint 10: 92.20 ± 1.47
 '''
 
 from models.stochastic_model import Model as StochasticModel
@@ -23,7 +23,7 @@ import pong_rl
 
 Model = StochasticModel
 model_type = "state_dqn"
-file_path = "agent/state_dqn/dqn_models/10.json"
+file_path = "agent/state_dqn/dqn_models/20.json"
 
 # load model from file
 

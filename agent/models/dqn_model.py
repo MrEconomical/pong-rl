@@ -24,7 +24,7 @@ class Model:
         self.explore_factor = explore_factor
         self.weights = weights
 
-    # create new model with He and Xavier initialization
+    # create new model with random small weights
 
     @classmethod
     def with_random_weights(self, input_size, hidden_size, output_size, learning_rate, discount_rate, explore_factor):

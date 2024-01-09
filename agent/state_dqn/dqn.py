@@ -31,7 +31,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        200, # hidden size
+        300, # hidden size
         2, # output size
         0.001, # learning rate
         0.99, # discount rate
@@ -62,7 +62,7 @@ buffer_len = 80000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9997
+explore_decay = 0.9994
 min_explore = 0.1
 
 while True:

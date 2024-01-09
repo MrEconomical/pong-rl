@@ -113,25 +113,28 @@ while True:
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
         total_error = 0
 
-        for transition in train_sample:
-            # calculate target value using target model
+        # batch calculate target values using target model
 
-            target_value = transition[2]
-            if not (transition[3] is None):
-                h, action_values = target_model.forward(transition[3])
-                best_value = max(action_values[0], action_values[1])
-                target_value += model.discount_rate * best_value
+        train_next = np.array([(np.zeros(model.input_size) if t[3] is None else t[3]) for t in train_sample])
+        h, action_values = target_model.batch_forward(train_next)
+        target_values = np.max(action_values, axis=0) * model.discount_rate
+        for t in range(batch_size):
+            if not (train_sample[t][3] is None):
+                target_values[t] += train_sample[t][2]
+            else:
+                target_values[t] = train_sample[t][2]
 
+        for t in range(batch_size):
             # back propagate target values through model
             
-            hidden_output, predicted_values = model.forward(transition[0])
-            target_values = np.copy(predicted_values)
-            target_values[transition[1]] = target_value
+            hidden_output, predicted_values = model.forward(train_sample[t][0])
+            update_values = np.copy(predicted_values)
+            update_values[train_sample[t][1]] = target_values[t]
             hidden_grad, output_grad, error = model.back_prop(
-                transition[0],
+                train_sample[t][0],
                 hidden_output,
                 predicted_values,
-                target_values
+                update_values
             )
 
             hidden_batch += hidden_grad

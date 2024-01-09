@@ -75,6 +75,15 @@ class Model:
 
         return hidden_output, output
 
+    # calculate batched forward propagation result
+
+    def batch_forward(self, input_batch):
+        hidden_outputs = np.dot(self.weights[0][:, :-1], np.transpose(input_batch)) + self.weights[0][:, -1:]
+        np.maximum(hidden_outputs, 0, out=hidden_outputs) # relu activation
+        outputs = np.dot(self.weights[1][:, :-1], hidden_outputs) + self.weights[1][:, -1:]
+
+        return hidden_outputs, outputs
+
     # calculate gradients with back propagation
 
     def back_prop(self, input_data, hidden_output, output, expected):

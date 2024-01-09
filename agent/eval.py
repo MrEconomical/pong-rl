@@ -8,7 +8,7 @@ results:
 state label stochastic checkpoint 8: 50.60 ± 3.72
 state label batch checkpoint 8: 53.00 ± 2.90
 direct frame label stochastic checkpoint 8: 52.60 ± 5.04
-direct frame label batch checkpoint 8: 55.8 ± 5.88
+direct frame label batch checkpoint 8: 55.80 ± 5.88
 state hit dqn checkpoint 8: 85.40 ± 1.50
 state dqn checkpoint 10: 92.20 ± 1.47
 '''

@@ -15,12 +15,16 @@ import random
 
 # create or load model
 
+save_folder = "dqn_models"
 load_model = False
 checkpoint = 0
+log_interval = 1000
+save_interval = 1000
+print("save folder: " + save_folder)
 
 model = None
 if load_model:
-    model = Model.from_save("agent/state_hit_dqn/dqn_models/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -59,11 +63,11 @@ target_model = copy.deepcopy(model)
 sync_interval = 8
 
 transitions = []
-buffer_len = 50000
+buffer_len = 30000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.998
+explore_decay = 0.997
 min_explore = 0.1
 
 while True:
@@ -169,7 +173,7 @@ while True:
         
     pong.reset()
     
-    if episode_num % 1000 == 0:
+    if episode_num % log_interval == 0:
         print("FINISHED EPISODE:", episode_num)
         print("wins and losses:", wins, losses)
         print("explore factor:", model.explore_factor)
@@ -177,6 +181,6 @@ while True:
         wins = 0
         losses = 0
     
-    if episode_num % 2000 == 0:
+    if episode_num % save_interval == 0:
         checkpoint += 1
-        model.save("agent/state_hit_dqn/dqn_models/" + str(checkpoint) + ".json")
+        model.save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")

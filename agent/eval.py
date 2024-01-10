@@ -3,12 +3,12 @@ evaluate model performance in Pong environment
 '''
 
 '''
-5 trials of 100 games (with frame skipping)
+20 trials of 500 games (with frame skipping)
 results:
-state label stochastic checkpoint 8: 50.60 ± 3.72
-state label batch checkpoint 8: 53.00 ± 2.90
-direct frame label stochastic checkpoint 8: 52.60 ± 5.04
-direct frame label batch checkpoint 8: 55.80 ± 5.88
+state label stochastic checkpoint 8: 50.48 ± 1.54
+state label batch checkpoint 8: 50.17 ± 2.02
+direct frame label stochastic checkpoint 8: 51.98 ± 2.12
+direct frame label batch checkpoint 8: 52.55 ± 1.94
 state hit dqn checkpoint 8: 85.40 ± 1.50
 state dqn checkpoint 10: 92.20 ± 1.47
 '''
@@ -22,8 +22,8 @@ import pong_rl
 # test parameters
 
 Model = StochasticModel
-model_type = "state_dqn"
-file_path = "agent/state_dqn/dqn_models/20.json"
+model_type = "direct_frame_label"
+file_path = "agent/direct_frame_label/batch_models/8.json"
 
 # load model from file
 
@@ -39,8 +39,8 @@ print("loaded model with parameters ({}, {}, {})".format(
 pong = pong_rl.PongEnv.without_render()
 pong.start()
 
-num_trials = 5
-trial_len = 100
+num_trials = 20
+trial_len = 500
 records = []
 
 for t in range(num_trials):
@@ -91,7 +91,6 @@ win_rates = [r[0] * 100 / (r[0] + r[1]) for r in records]
 mean_win_rate = sum(win_rates) / len(win_rates)
 deviation = np.std(win_rates)
 
-print("records:", records)
 print("win rates:", win_rates)
 print("mean win rate:", mean_win_rate)
 print("standard deviation:", deviation)

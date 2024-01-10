@@ -14,11 +14,11 @@ import random
 
 # create or load model
 
-save_folder = "dqn_models"
+save_folder = "dqn_models_300_9993"
 load_model = False
 checkpoint = 0
 log_interval = 1000
-save_interval = 3000
+save_interval = 2000
 print("save folder: " + save_folder)
 
 model = None
@@ -66,7 +66,7 @@ buffer_len = 80000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.9994
+explore_decay = 0.9993
 min_explore = 0.1
 
 while True:
@@ -154,7 +154,7 @@ while True:
 
     # update target model
 
-    if episode_num % sync_interval == 0:
+    if episode_num % sync_interval == 0 and len(transitions) == buffer_len:
         if model.explore_factor > min_explore:
             model.explore_factor *= explore_decay
         target_model = copy.deepcopy(model)

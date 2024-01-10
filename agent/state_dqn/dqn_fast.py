@@ -14,7 +14,7 @@ import random
 
 # create or load model
 
-save_folder = "dqn_models_fast"
+save_folder = "dqn_models"
 load_model = False
 checkpoint = 0
 log_interval = 1000

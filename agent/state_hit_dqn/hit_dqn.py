@@ -24,7 +24,7 @@ print("save folder: " + save_folder)
 
 model = None
 if load_model:
-    model = Model.from_save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
+    model = Model.from_save("agent/state_hit_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
     print("loaded model with parameters ({}, {}, {}, {}, {}) from checkpoint {}".format(
         model.input_size,
         model.hidden_size,
@@ -36,7 +36,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        50, # hidden size
+        100, # hidden size
         2, # output size
         0.001, # learning rate
         0.99, # discount rate
@@ -63,11 +63,11 @@ target_model = copy.deepcopy(model)
 sync_interval = 8
 
 transitions = []
-buffer_len = 30000
+buffer_len = 40000
 buffer_index = 0
 
 batch_size = 32
-explore_decay = 0.997
+explore_decay = 0.9997
 min_explore = 0.1
 
 while True:
@@ -126,32 +126,33 @@ while True:
         train_sample = random.sample(transitions, batch_size)
         hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
-        total_error = 0
 
-        for transition in train_sample:
-            # calculate target value using target model
+        # batch calculate target values using target model
 
-            target_value = transition[2]
-            if not (transition[3] is None):
-                h, action_values = target_model.forward(transition[3])
-                best_value = max(action_values[0], action_values[1])
-                target_value += model.discount_rate * best_value
+        train_next = np.array([(np.zeros(model.input_size) if t[3] is None else t[3]) for t in train_sample])
+        h, action_values = target_model.batch_forward(train_next)
+        target_values = np.max(action_values, axis=0) * model.discount_rate
+        for t in range(batch_size):
+            if not (train_sample[t][3] is None):
+                target_values[t] += train_sample[t][2]
+            else:
+                target_values[t] = train_sample[t][2]
 
+        for t in range(batch_size):
             # back propagate target values through model
             
-            hidden_output, predicted_values = model.forward(transition[0])
-            target_values = np.copy(predicted_values)
-            target_values[transition[1]] = target_value
+            hidden_output, predicted_values = model.forward(train_sample[t][0])
+            update_values = np.copy(predicted_values)
+            update_values[train_sample[t][1]] = target_values[t]
             hidden_grad, output_grad, error = model.back_prop(
-                transition[0],
+                train_sample[t][0],
                 hidden_output,
                 predicted_values,
-                target_values
+                update_values
             )
 
             hidden_batch += hidden_grad
             output_batch += output_grad
-            total_error += error
         
         model.apply_gradients(hidden_batch, output_batch)
     
@@ -162,12 +163,13 @@ while True:
     else:
         wins += 1
 
-    # update target model
+    # decay explore rate and update target model
 
-    if episode_num % sync_interval == 0:
+    if len(transitions) == buffer_len:
         if model.explore_factor > min_explore:
             model.explore_factor *= explore_decay
-        target_model = copy.deepcopy(model)
+        if episode_num % sync_interval == 0:
+            target_model = copy.deepcopy(model)
     
     # reset game environment
         
@@ -183,4 +185,4 @@ while True:
     
     if episode_num % save_interval == 0:
         checkpoint += 1
-        model.save("agent/state_dqn/" + save_folder + "/" + str(checkpoint) + ".json")
+        model.save("agent/state_hit_dqn/" + save_folder + "/" + str(checkpoint) + ".json")

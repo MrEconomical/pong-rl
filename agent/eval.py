@@ -2,17 +2,6 @@
 evaluate model performance in Pong environment
 '''
 
-'''
-20 trials of 500 games (with frame skipping)
-results:
-state label stochastic checkpoint 8: 50.48 ± 1.54
-state label batch checkpoint 8: 50.17 ± 2.02
-direct frame label stochastic checkpoint 8: 51.98 ± 2.12
-direct frame label batch checkpoint 8: 52.55 ± 1.94
-state hit dqn checkpoint 8: 85.40 ± 1.50
-state dqn checkpoint 10: 92.20 ± 1.47
-'''
-
 from models.stochastic_model import Model as StochasticModel
 from models.batch_model import Model as BatchModel
 from models.dqn_model import Model as DQNModel
@@ -21,26 +10,26 @@ import pong_rl
 
 # test parameters
 
-Model = StochasticModel
-model_type = "direct_frame_label"
-file_path = "agent/direct_frame_label/batch_models/8.json"
-
-# load model from file
-
-model = Model.from_save(file_path)
-print("loaded model with parameters ({}, {}, {})".format(
-    model.input_size,
-    model.hidden_size,
-    model.output_size,
-))
+Model = DQNModel
+model_type = "state_dqn"
+folder_path = "agent/state_dqn/dqn_models"
+checkpoint = 19
+num_trials = 20
+trial_len = 500
 
 # create game environment
 
 pong = pong_rl.PongEnv.without_render()
 pong.start()
 
-num_trials = 20
-trial_len = 500
+# load model from file
+
+model = Model.from_save(folder_path + "/" + str(checkpoint) + ".json")
+print("loaded model with parameters ({}, {}, {})".format(
+    model.input_size,
+    model.hidden_size,
+    model.output_size,
+))
 records = []
 
 for t in range(num_trials):

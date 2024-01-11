@@ -13,7 +13,7 @@ import pong_rl
 Model = DQNModel
 model_type = "state_dqn"
 folder_path = "agent/state_dqn/dqn_models"
-checkpoint = 19
+checkpoint = 28
 num_trials = 20
 trial_len = 500
 

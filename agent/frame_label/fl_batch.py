@@ -27,7 +27,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         12000, # input size
-        100, # hidden size
+        50, # hidden size
         1, # output size
         0.001, # learning rate
     )
@@ -125,6 +125,6 @@ while True:
         wins = 0
         losses = 0
     
-    if episode_num % 200 == 0:
+    if episode_num % 400 == 0:
         checkpoint += 1
         model.save("agent/frame_label/batch_models/" + str(checkpoint) + ".json")

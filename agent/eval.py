@@ -36,8 +36,11 @@ for t in range(num_trials):
     # run trial and record wins and losses
 
     record = [0, 0]
+    
     for e in range(trial_len):
+        prev_frame = pong.get_normalized_frame()
         reward = 0
+
         while reward == 0:
             # process game state
             
@@ -53,6 +56,10 @@ for t in range(num_trials):
             elif model_type == "direct_frame_label":
                 h, action_prob = model.forward(current_frame)
                 action = 1 if np.random.uniform() < action_prob[0] else 0
+            elif model_type == "frame_label":
+                stacked_frame = np.concatenate((prev_frame, current_frame))
+                h, action_prob = model.forward(stacked_frame)
+                action = 1 if np.random.uniform() < action_prob[0] else 0
             elif model_type == "state_dqn":
                 h, action_values = model.forward(game_state)
                 action = 0 if action_values[0] >= action_values[1] else 1
@@ -62,6 +69,7 @@ for t in range(num_trials):
             reward = pong.tick(action)
             if reward == 0:
                 reward = pong.tick(action)
+            prev_frame = current_frame
         
         # record final result
         

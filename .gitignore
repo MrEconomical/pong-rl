@@ -2,6 +2,7 @@ agent/state_label/stochastic_models
 agent/state_label/batch_models
 agent/direct_frame_label/stochastic_models
 agent/direct_frame_label/batch_models
+agent/frame_label/batch_models
 agent/state_hit_dqn/dqn_models
 agent/state_dqn/dqn_models
 __pycache__

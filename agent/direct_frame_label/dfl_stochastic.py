@@ -115,4 +115,3 @@ while True:
     if episode_num % 400 == 0:
         checkpoint += 1
         model.save("agent/direct_frame_label/stochastic_models/" + str(checkpoint) + ".json")
-        

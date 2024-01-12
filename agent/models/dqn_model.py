@@ -92,7 +92,7 @@ class Model:
         output_deltas = output - expected # using linear derivative
         output_gradients = np.empty((self.output_size, self.hidden_size + 1))
         output_gradients[:, :-1] = np.outer(output_deltas, hidden_output) # set output weight derivatives
-        output_gradients[:, -1:] = np.reshape(output_deltas, (self.output_size, 1)) # bias is a fixed input of 1
+        output_gradients[:, -1:] = np.reshape(output_deltas, (self.output_size, 1)) # bias is a fixed input
 
         # calculate gradients for hidden neurons using relu derivative
 
@@ -100,13 +100,31 @@ class Model:
         hidden_deltas = hidden_predeltas * (hidden_output > 0) # using relu derivative
         hidden_gradients = np.empty((self.hidden_size, self.input_size + 1))
         hidden_gradients[:, :-1] = np.outer(hidden_deltas, input_data) # set hidden weight derivatives
-        hidden_gradients[:, -1:] = np.reshape(hidden_deltas, (self.hidden_size, 1)) # bias is a fixed input of 1
+        hidden_gradients[:, -1:] = np.reshape(hidden_deltas, (self.hidden_size, 1)) # bias is a fixed input
 
         # return gradients and error
 
         difference = expected - output
         error = difference.dot(difference) / len(difference)
         return hidden_gradients, output_gradients, error
+
+    # calculate batched gradients with back propagation
+
+    def batch_back_prop(self, input_batch, hidden_outputs, outputs, expected):
+        # calculate gradients for output neuron using linear derivative
+
+        batch_len = len(input_batch)
+        output_deltas = np.transpose(outputs) - expected # using linear derivative
+        output_gradients = np.empty((batch_len, self.output_size, self.hidden_size + 1))
+        output_gradients[:, :, :-1] = np.matmul(
+            np.reshape(output_deltas, (batch_len, self.output_size, 1)), # stack output deltas for weight derivatives
+            np.reshape(np.transpose(hidden_outputs), (batch_len, 1, self.hidden_size)) # stack hidden outputs
+        )
+        output_gradients[:, :, -1:] = np.reshape(output_deltas, (batch_len, self.output_size, 1)) # bias is a fixed input
+
+        # calculate gradients for hidden neurons using relu derivative
+
+        pass
     
     # update weights with gradients
 

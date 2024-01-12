@@ -5,6 +5,7 @@ agent/direct_frame_label/batch_models
 agent/frame_label/batch_models
 agent/state_hit_dqn/dqn_models
 agent/state_dqn/dqn_models
+agent/frame_dqn/dqn_models
 __pycache__
 target
 venv

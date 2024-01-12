@@ -105,7 +105,7 @@ class Model:
         # return gradients and error
 
         difference = expected - output
-        error = difference.dot(difference) / len(difference)
+        error = difference.dot(difference) / self.output_size
         return hidden_gradients, output_gradients, error
 
     # calculate batched gradients with back propagation
@@ -124,7 +124,20 @@ class Model:
 
         # calculate gradients for hidden neurons using relu derivative
 
-        pass
+        hidden_predeltas = np.dot(output_deltas, self.weights[1][:, :-1]) # find total error per neuron
+        hidden_deltas = hidden_predeltas * (np.transpose(hidden_outputs) > 0) # using relu derivative
+        hidden_gradients = np.empty((batch_len, self.hidden_size, self.input_size + 1))
+        hidden_gradients[:, :, :-1] = np.matmul(
+            np.reshape(hidden_deltas, (batch_len, self.hidden_size, 1)), # stack hidden deltas for weight derivatives
+            np.reshape(input_batch, (batch_len, 1, self.input_size)) # stack input batch
+        )
+        hidden_gradients[:, :, -1:] = np.reshape(hidden_deltas, (batch_len, self.hidden_size, 1)) # bias is a fixed input
+
+        # return gradients and errors
+
+        difference = expected - np.transpose(outputs)
+        errors = np.sum(difference * difference, axis=1) / self.output_size
+        return hidden_gradients, output_gradients, errors
     
     # update weights with gradients
 

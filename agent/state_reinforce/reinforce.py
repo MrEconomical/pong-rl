@@ -32,9 +32,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        300, # hidden size
+        500, # hidden size
         2, # output size
-        0.001, # learning rate
+        0.0001, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(

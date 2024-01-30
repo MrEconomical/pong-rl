@@ -15,8 +15,8 @@ import pong_rl
 save_folder = "reinforce_models"
 load_model = False
 checkpoint = 0
-log_interval = 5000
-save_interval = 5000
+log_interval = 4000
+save_interval = 4000
 print("save folder: " + save_folder)
 
 model = None
@@ -32,9 +32,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        500, # hidden size
+        300, # hidden size
         2, # output size
-        0.0001, # learning rate
+        0.0005, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -50,6 +50,12 @@ pong = pong_rl.PongEnv.without_render()
 episode_num = 0
 wins = 0
 losses = 0
+
+# initialize training data
+
+hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
+output_batch = np.zeros((model.output_size, model.hidden_size + 1))
+batch_size = 32
 
 while True:
     # initialize episode data
@@ -96,9 +102,6 @@ while True:
     episode_rewards /= np.std(episode_rewards)
     
     # calculate policy gradients
-            
-    hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
-    output_batch = np.zeros((model.output_size, model.hidden_size + 1))
 
     for s in range(len(episode_states)):
         hidden_grad, output_grad = model.back_prop(
@@ -112,7 +115,12 @@ while True:
         hidden_batch += hidden_grad
         output_batch += output_grad
     
-    model.apply_gradients(hidden_batch, output_batch)
+    # apply gradient batch
+
+    if episode_num % batch_size == 0:
+        model.apply_gradients(hidden_batch, output_batch)
+        hidden_batch.fill(0)
+        output_batch.fill(0)
 
     # update stats counter
     

@@ -66,16 +66,16 @@ while True:
         # predict action
 
         game_state = pong.get_normalized_state()
-        hidden_output, action_prob = model.forward(game_state)
-        action = np.random.choice(action_prob.size, p=action_prob)
+        hidden_output, action_probs = model.forward(game_state)
+        action = np.random.choice(action_probs.size, p=action_probs)
 
         # store state and action data
 
         episode_states.append(game_state)
         episode_hidden_outputs.append(hidden_output)
-        episode_outputs.append(action_prob)
+        episode_outputs.append(action_probs)
 
-        action_vector = np.zeros(action_prob.size)
+        action_vector = np.zeros(action_probs.size)
         action_vector[action] = 1
         episode_actions.append(action_vector)
 

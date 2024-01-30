@@ -5,17 +5,18 @@ evaluate model performance in Pong environment
 from models.stochastic_model import Model as StochasticModel
 from models.batch_model import Model as BatchModel
 from models.dqn_model import Model as DQNModel
+from models.policy_model import Model as PolicyModel
 import numpy as np
 import pong_rl
 
 # test parameters
 
-Model = DQNModel
-model_type = "state_dqn"
-folder_path = "agent/state_dqn/dqn_models"
-checkpoint_range = [1, 28]
-num_trials = 5
-trial_len = 200
+Model = PolicyModel
+model_type = "state_policy"
+folder_path = "agent/state_reinforce/reinforce_models_2"
+checkpoint_range = [135, 206]
+num_trials = 3
+trial_len = 100
 print("save folder:", folder_path)
 
 # create game environment
@@ -53,6 +54,9 @@ for checkpoint in range(checkpoint_range[0], checkpoint_range[1] + 1):
                 elif model_type == "state_dqn":
                     h, action_values = model.forward(game_state)
                     action = 0 if action_values[0] >= action_values[1] else 1
+                elif model_type == "state_policy":
+                    h, action_probs = model.forward(game_state)
+                    action = np.random.choice(action_probs.size, p=action_probs)
 
                 # advance game with action
                 

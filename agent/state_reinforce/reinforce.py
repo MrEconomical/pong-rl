@@ -12,11 +12,11 @@ import pong_rl
 
 # create or load model
 
-save_folder = "reinforce_models"
+save_folder = "reinforce_models_1"
 load_model = False
-checkpoint = 0
-log_interval = 4000
-save_interval = 4000
+checkpoint = 9
+log_interval = 2000
+save_interval = 2000
 print("save folder: " + save_folder)
 
 model = None
@@ -32,9 +32,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        300, # hidden size
+        600, # hidden size
         2, # output size
-        0.0005, # learning rate
+        0.001, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(

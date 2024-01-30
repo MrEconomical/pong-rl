@@ -10,7 +10,10 @@ import numpy as np
 class Model:
     input_size = None
     hidden_size = None
+    output_size = None
     learning_rate = None
+    discount_rate = None
+    explore_factor = None
     weights = None
 
     # set model data

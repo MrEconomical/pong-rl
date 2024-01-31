@@ -14,9 +14,9 @@ import pong_rl
 
 save_folder = "reinforce_models_1"
 load_model = False
-checkpoint = 9
-log_interval = 2000
-save_interval = 2000
+checkpoint = 0
+log_interval = 3000
+save_interval = 3000
 print("save folder: " + save_folder)
 
 model = None
@@ -34,7 +34,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.001, # learning rate
+        0.0005, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -55,7 +55,7 @@ losses = 0
 
 hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
 output_batch = np.zeros((model.output_size, model.hidden_size + 1))
-batch_size = 32
+batch_size = 128
 
 while True:
     # initialize episode data

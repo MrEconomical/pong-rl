@@ -30,11 +30,11 @@ class Model:
     @classmethod
     def with_random_weights(self, input_size, hidden_size, output_size, learning_rate, discount_rate):
         hidden_weights = np.empty((hidden_size, input_size + 1))
-        hidden_weights[:, :-1] = np.random.randn(hidden_size, input_size) * np.sqrt(2 / input_size) # He initialization
+        hidden_weights[:, :-1] = np.random.randn(hidden_size, input_size) / 50 # initialize with small weights
         hidden_weights[:, -1] = 0
 
         output_weights = np.empty((output_size, hidden_size + 1))
-        output_weights[:, :-1] = np.random.randn(output_size, hidden_size) * np.sqrt(1 / hidden_size) # Xavier initialization
+        output_weights[:, :-1] = np.random.randn(output_size, hidden_size) / 50 # initialize with small weights
         output_weights[:, -1] = 0
 
         return self(

@@ -13,8 +13,8 @@ import pong_rl
 
 Model = PolicyModel
 model_type = "state_policy"
-folder_path = "agent/state_reinforce/reinforce_models_2"
-checkpoint_range = [135, 206]
+folder_path = "agent/state_reinforce/reinforce_models_1"
+checkpoint_range = [1, 50]
 num_trials = 3
 trial_len = 100
 print("save folder:", folder_path)

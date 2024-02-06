@@ -53,19 +53,19 @@ losses = 0
 
 # initialize training data
 
-hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
-output_batch = np.zeros((model.output_size, model.hidden_size + 1))
-batch_size = 128
+batch_size = 50
+batch_states = []
+batch_hidden_outputs = []
+batch_outputs = []
+batch_actions = []
+batch_rewards = []
 
 while True:
     # initialize episode data
 
     pong.start()
     episode_num += 1
-    episode_states = []
-    episode_hidden_outputs = []
-    episode_outputs = []
-    episode_actions = []
+    num_states = 0
     final_reward = 0
 
     while final_reward == 0:
@@ -77,13 +77,14 @@ while True:
 
         # store state and action data
 
-        episode_states.append(game_state)
-        episode_hidden_outputs.append(hidden_output)
-        episode_outputs.append(action_probs)
+        num_states += 1
+        batch_states.append(game_state)
+        batch_hidden_outputs.append(hidden_output)
+        batch_outputs.append(action_probs)
 
         action_vector = np.zeros(action_probs.size)
         action_vector[action] = 1
-        episode_actions.append(action_vector)
+        batch_actions.append(action_vector)
 
         # advance game state
 
@@ -93,34 +94,41 @@ while True:
 
     # calculate discounted rewards
             
-    episode_rewards = np.empty(len(episode_states))
-    episode_rewards[len(episode_states) - 1] = final_reward
-    for s in range(len(episode_states) - 2, -1, -1):
-        episode_rewards[s] = episode_rewards[s + 1] * model.discount_rate
-
-    episode_rewards -= np.mean(episode_rewards)
-    episode_rewards /= np.std(episode_rewards)
-    
-    # calculate policy gradients
-
-    for s in range(len(episode_states)):
-        hidden_grad, output_grad = model.back_prop(
-            episode_states[s],
-            episode_hidden_outputs[s],
-            episode_outputs[s],
-            episode_actions[s],
-            episode_rewards[s],
-        )
-
-        hidden_batch += hidden_grad
-        output_batch += output_grad
-    
-    # apply gradient batch
+    for s in range(num_states):
+        reward = final_reward * (model.discount_rate ** (num_states - s - 1))
+        batch_rewards.append(reward)
 
     if episode_num % batch_size == 0:
+        # normalize batch rewards
+
+        batch_rewards -= np.mean(batch_rewards)
+        batch_rewards /= np.std(batch_rewards)
+
+        # calculate and apply policy gradients
+
+        hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
+        output_batch = np.zeros((model.output_size, model.hidden_size + 1))
+
+        for s in range(len(batch_states)):
+            hidden_grad, output_grad = model.back_prop(
+                batch_states[s],
+                batch_hidden_outputs[s],
+                batch_outputs[s],
+                batch_actions[s],
+                batch_rewards[s],
+            )
+            hidden_batch += hidden_grad
+            output_batch += output_grad
+
         model.apply_gradients(hidden_batch, output_batch)
-        hidden_batch.fill(0)
-        output_batch.fill(0)
+
+        # reset batch data
+
+        batch_states.clear()
+        batch_hidden_outputs.clear()
+        batch_outputs.clear()
+        batch_actions.clear()
+        batch_rewards = []
 
     # update stats counter
     

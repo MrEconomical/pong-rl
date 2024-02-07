@@ -15,8 +15,8 @@ import pong_rl
 save_folder = "reinforce_models_1"
 load_model = False
 checkpoint = 0
-log_interval = 3000
-save_interval = 3000
+log_interval = 5000
+save_interval = 5000
 print("save folder: " + save_folder)
 
 model = None
@@ -32,7 +32,7 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        600, # hidden size
+        800, # hidden size
         2, # output size
         0.0003, # learning rate
         0.99, # discount rate

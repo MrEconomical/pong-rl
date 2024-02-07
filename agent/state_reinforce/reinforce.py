@@ -15,8 +15,8 @@ import pong_rl
 save_folder = "reinforce_models_1"
 load_model = False
 checkpoint = 0
-log_interval = 5000
-save_interval = 5000
+log_interval = 8000
+save_interval = 8000
 print("save folder: " + save_folder)
 
 model = None

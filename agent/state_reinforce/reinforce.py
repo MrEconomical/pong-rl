@@ -53,7 +53,7 @@ losses = 0
 
 # initialize training data
 
-batch_size = 200
+batch_size = 800
 batch_states = []
 batch_hidden_outputs = []
 batch_outputs = []

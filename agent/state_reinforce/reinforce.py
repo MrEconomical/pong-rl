@@ -32,9 +32,9 @@ if load_model:
 else:
     model = Model.with_random_weights(
         6, # input size
-        800, # hidden size
+        600, # hidden size
         2, # output size
-        0.0003, # learning rate
+        0.0002, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -53,7 +53,7 @@ losses = 0
 
 # initialize training data
 
-batch_size = 100
+batch_size = 200
 batch_states = []
 batch_hidden_outputs = []
 batch_outputs = []

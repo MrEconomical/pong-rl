@@ -24,6 +24,12 @@ class ArrayVec:
     
     def clear(self):
         self.index = 0
+
+    def len(self):
+        return self.index
     
     def get_ref(self):
         return self.array[0:self.index]
+    
+    def get_item(self, index):
+        return self.array[index]

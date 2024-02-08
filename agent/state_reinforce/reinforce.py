@@ -13,7 +13,7 @@ import pong_rl
 
 # create or load model
 
-save_folder = "reinforce_models_1"
+save_folder = "reinforce_models_2"
 load_model = False
 checkpoint = 0
 log_interval = 8000
@@ -114,12 +114,12 @@ while True:
         hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
 
-        for s in range(batch_states.index):
+        for s in range(batch_states.len()):
             hidden_grad, output_grad = model.back_prop(
-                batch_states.get_ref()[s],
-                batch_hidden_outputs.get_ref()[s],
-                batch_outputs.get_ref()[s],
-                batch_actions.get_ref()[s],
+                batch_states.get_item(s),
+                batch_hidden_outputs.get_item(s),
+                batch_outputs.get_item(s),
+                batch_actions.get_item(s),
                 batch_rewards[s],
             )
             hidden_batch += hidden_grad

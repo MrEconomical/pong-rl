@@ -99,6 +99,7 @@ class Model:
         return hidden_gradients, output_gradients
     
     def batch_back_prop(self, input_batch, hidden_outputs, outputs, actions, rewards):
+        # TODO: investigate precision loss
         # calculate gradients for output neuron using softmax derivative
 
         batch_len = len(input_batch)

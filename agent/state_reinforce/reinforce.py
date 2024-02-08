@@ -16,8 +16,8 @@ import pong_rl
 save_folder = "reinforce_models"
 load_model = False
 checkpoint = 0
-log_interval = 6000
-save_interval = 12000
+log_interval = 8000
+save_interval = 16000
 print("save folder: " + save_folder)
 
 model = None
@@ -35,7 +35,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.0002, # learning rate
+        0.0001, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -54,7 +54,7 @@ losses = 0
 
 # initialize training data
 
-batch_size = 800
+batch_size = 1600
 sample_size = 800
 sample_split = 40000
 initial_len = 200000

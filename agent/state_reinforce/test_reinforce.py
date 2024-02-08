@@ -10,7 +10,7 @@ from models.policy_model import Model
 import numpy as np
 import pong_rl
 
-checkpoint = 50
+checkpoint = 57
 save_folder = "reinforce_models"
 model = Model.from_save("agent/state_reinforce/" + save_folder + "/" + str(checkpoint) + ".json")
 print("loaded model with parameters ({}, {}, {}, {}) from checkpoint {}".format(

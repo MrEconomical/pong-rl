@@ -81,7 +81,7 @@ class Model:
     def back_prop(self, input_data, hidden_output, output, action, reward):
         # calculate gradients for output neuron using softmax derivative
 
-        output_deltas = (output - action) * reward # using softmax derivative and policy gradient theorem
+        output_deltas = (output - action) * reward # using softmax derivative and policy gradient
         output_gradients = np.empty((self.output_size, self.hidden_size + 1))
         output_gradients[:, :-1] = np.outer(output_deltas, hidden_output) # set output weight derivatives
         output_gradients[:, -1:] = np.reshape(output_deltas, (self.output_size, 1)) # bias is a fixed input of 1
@@ -93,6 +93,33 @@ class Model:
         hidden_gradients = np.empty((self.hidden_size, self.input_size + 1))
         hidden_gradients[:, :-1] = np.outer(hidden_deltas, input_data) # set hidden weight derivatives
         hidden_gradients[:, -1:] = np.reshape(hidden_deltas, (self.hidden_size, 1)) # bias is a fixed input of 1
+
+        # return gradients
+
+        return hidden_gradients, output_gradients
+    
+    def batch_back_prop(self, input_batch, hidden_outputs, outputs, actions, rewards):
+        # calculate gradients for output neuron using softmax derivative
+
+        batch_len = len(input_batch)
+        output_deltas = (outputs - actions) * rewards.reshape(-1, 1) # using softmax derivative and policy gradient
+        output_gradients = np.empty((batch_len, self.output_size, self.hidden_size + 1))
+        output_gradients[:, :, :-1] = np.matmul(
+            np.reshape(output_deltas, (batch_len, self.output_size, 1)), # stack output deltas for weight derivatives
+            np.reshape(hidden_outputs, (batch_len, 1, self.hidden_size)) # stack hidden outputs
+        )
+        output_gradients[:, :, -1:] = np.reshape(output_deltas, (batch_len, self.output_size, 1)) # bias is a fixed input
+
+        # calculate gradients for hidden neurons using relu derivative
+
+        hidden_predeltas = np.dot(output_deltas, self.weights[1][:, :-1]) # find total error per neuron
+        hidden_deltas = hidden_predeltas * (hidden_outputs > 0) # using relu derivative
+        hidden_gradients = np.empty((batch_len, self.hidden_size, self.input_size + 1))
+        hidden_gradients[:, :, :-1] = np.matmul(
+            np.reshape(hidden_deltas, (batch_len, self.hidden_size, 1)), # stack hidden deltas for weight derivatives
+            np.reshape(input_batch, (batch_len, 1, self.input_size)) # stack input batch
+        )
+        hidden_gradients[:, :, -1:] = np.reshape(hidden_deltas, (batch_len, self.hidden_size, 1)) # bias is a fixed input
 
         # return gradients
 

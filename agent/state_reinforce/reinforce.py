@@ -93,7 +93,7 @@ while True:
             final_reward = pong.tick(action)
 
     # calculate discounted rewards
-            
+
     for s in range(num_states):
         reward = final_reward * (model.discount_rate ** (num_states - s - 1))
         batch_rewards.append(reward)
@@ -101,6 +101,7 @@ while True:
     if episode_num % batch_size == 0:
         # normalize batch rewards
 
+        batch_rewards = np.array(batch_rewards)
         batch_rewards -= np.mean(batch_rewards)
         batch_rewards /= np.std(batch_rewards)
 
@@ -109,18 +110,17 @@ while True:
         hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
 
-        for s in range(len(batch_states)):
-            hidden_grad, output_grad = model.back_prop(
-                batch_states[s],
-                batch_hidden_outputs[s],
-                batch_outputs[s],
-                batch_actions[s],
-                batch_rewards[s],
-            )
-            hidden_batch += hidden_grad
-            output_batch += output_grad
-
-        model.apply_gradients(hidden_batch, output_batch)
+        hidden_grads, output_grads = model.batch_back_prop(
+            np.array(batch_states),
+            np.array(batch_hidden_outputs),
+            np.array(batch_outputs),
+            np.array(batch_actions),
+            batch_rewards,
+        )
+        model.apply_gradients(
+            np.sum(hidden_grads, axis=0),
+            np.sum(output_grads, axis=0)
+        )
 
         # reset batch data
 

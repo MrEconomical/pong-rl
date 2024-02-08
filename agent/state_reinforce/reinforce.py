@@ -15,8 +15,8 @@ import pong_rl
 save_folder = "reinforce_models_1"
 load_model = False
 checkpoint = 0
-log_interval = 8000
-save_interval = 8000
+log_interval = 12000
+save_interval = 12000
 print("save folder: " + save_folder)
 
 model = None
@@ -53,7 +53,7 @@ losses = 0
 
 # initialize training data
 
-batch_size = 800
+batch_size = 1200
 batch_states = []
 batch_hidden_outputs = []
 batch_outputs = []

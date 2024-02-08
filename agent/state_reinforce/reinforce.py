@@ -141,7 +141,6 @@ while True:
     if episode_num % log_interval == 0:
         print("FINISHED EPISODE:", episode_num)
         print("wins and losses:", wins, losses)
-
         wins = 0
         losses = 0
     

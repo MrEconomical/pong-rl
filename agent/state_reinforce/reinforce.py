@@ -34,7 +34,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.002, # learning rate
+        0.0001, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -115,8 +115,8 @@ while True:
             batch_rewards,
         )
         model.apply_gradients(
-            np.sum(hidden_grads, axis=0) / batch_size,
-            np.sum(output_grads, axis=0) / batch_size,
+            np.sum(hidden_grads, axis=0),
+            np.sum(output_grads, axis=0),
         )
 
         # reset batch data

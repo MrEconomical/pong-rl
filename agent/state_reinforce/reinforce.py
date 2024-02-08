@@ -34,7 +34,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.0001, # learning rate
+        0.00015, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(

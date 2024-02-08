@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(Path(__file__).parent.absolute()).parent.absolute()))
 
+from array_vec import ArrayVec
 from models.policy_model import Model
 import numpy as np
 import pong_rl
@@ -54,10 +55,13 @@ losses = 0
 # initialize training data
 
 batch_size = 1200
-batch_states = []
-batch_hidden_outputs = []
-batch_outputs = []
-batch_actions = []
+initial_len = 100000
+extend_len = 20000
+
+batch_states = ArrayVec((model.input_size,), initial_len, extend_len)
+batch_hidden_outputs = ArrayVec((model.hidden_size,), initial_len, extend_len)
+batch_outputs = ArrayVec((model.output_size,), initial_len, extend_len)
+batch_actions = ArrayVec((model.output_size,), initial_len, extend_len)
 batch_rewards = []
 
 while True:
@@ -78,13 +82,13 @@ while True:
         # store state and action data
 
         num_states += 1
-        batch_states.append(game_state)
-        batch_hidden_outputs.append(hidden_output)
-        batch_outputs.append(action_probs)
+        batch_states.push(game_state)
+        batch_hidden_outputs.push(hidden_output)
+        batch_outputs.push(action_probs)
 
         action_vector = np.zeros(action_probs.size)
         action_vector[action] = 1
-        batch_actions.append(action_vector)
+        batch_actions.push(action_vector)
 
         # advance game state
 
@@ -111,10 +115,10 @@ while True:
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
 
         hidden_grads, output_grads = model.batch_back_prop(
-            np.array(batch_states),
-            np.array(batch_hidden_outputs),
-            np.array(batch_outputs),
-            np.array(batch_actions),
+            batch_states.get_ref(),
+            batch_hidden_outputs.get_ref(),
+            batch_outputs.get_ref(),
+            batch_actions.get_ref(),
             batch_rewards,
         )
         model.apply_gradients(

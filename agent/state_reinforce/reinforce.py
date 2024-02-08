@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(Path(__file__).parent.absolute()).parent.absolute()))
 
+from models.array_vec import ArrayVec
 from models.policy_model import Model
 import numpy as np
 import pong_rl
@@ -16,7 +17,7 @@ save_folder = "reinforce_models"
 load_model = False
 checkpoint = 0
 log_interval = 8000
-save_interval = 16000
+save_interval = 8000
 print("save folder: " + save_folder)
 
 model = None
@@ -34,7 +35,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.00015, # learning rate
+        0.0002, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -53,11 +54,14 @@ losses = 0
 
 # initialize training data
 
-batch_size = 800
-batch_states = []
-batch_hidden_outputs = []
-batch_outputs = []
-batch_actions = []
+batch_size = 400
+initial_len = 80000
+extend_len = 20000
+
+batch_states = ArrayVec((model.input_size,), initial_len, extend_len)
+batch_hidden_outputs = ArrayVec((model.hidden_size,), initial_len, extend_len)
+batch_outputs = ArrayVec((model.output_size,), initial_len, extend_len)
+batch_actions = ArrayVec((model.output_size,), initial_len, extend_len)
 batch_rewards = []
 
 while True:
@@ -78,13 +82,13 @@ while True:
         # store state and action data
 
         num_states += 1
-        batch_states.append(game_state)
-        batch_hidden_outputs.append(hidden_output)
-        batch_outputs.append(action_probs)
+        batch_states.push(game_state)
+        batch_hidden_outputs.push(hidden_output)
+        batch_outputs.push(action_probs)
 
         action_vector = np.zeros(action_probs.size)
         action_vector[action] = 1
-        batch_actions.append(action_vector)
+        batch_actions.push(action_vector)
 
         # advance game state
 
@@ -108,10 +112,10 @@ while True:
         # calculate and apply policy gradients
 
         hidden_grads, output_grads = model.batch_back_prop(
-            np.array(batch_states),
-            np.array(batch_hidden_outputs),
-            np.array(batch_outputs),
-            np.array(batch_actions),
+            batch_states.get_ref(),
+            batch_hidden_outputs.get_ref(),
+            batch_outputs.get_ref(),
+            batch_actions.get_ref(),
             batch_rewards,
         )
         model.apply_gradients(

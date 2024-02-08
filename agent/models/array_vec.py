@@ -28,8 +28,15 @@ class ArrayVec:
     def len(self):
         return self.index
     
-    def get_ref(self):
-        return self.array[0:self.index]
-    
     def get_item(self, index):
         return self.array[index]
+    
+    def get_view(self, start, end):
+        if start >= self.index:
+            return self.array[0:0]
+        elif end > self.index:
+            return self.array[start:self.index]
+        return self.array[start:end]
+    
+    def get_ref(self):
+        return self.array[0:self.index]

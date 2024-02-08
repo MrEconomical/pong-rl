@@ -55,14 +55,18 @@ losses = 0
 # initialize training data
 
 batch_size = 400
-initial_len = 80000
+sample_size = 400
+sample_split = 30000
+initial_len = 100000
 extend_len = 20000
 
-batch_states = ArrayVec((model.input_size,), initial_len, extend_len)
-batch_hidden_outputs = ArrayVec((model.hidden_size,), initial_len, extend_len)
-batch_outputs = ArrayVec((model.output_size,), initial_len, extend_len)
-batch_actions = ArrayVec((model.output_size,), initial_len, extend_len)
-batch_rewards = []
+sample_states = ArrayVec((model.input_size,), initial_len, extend_len)
+sample_hidden_outputs = ArrayVec((model.hidden_size,), initial_len, extend_len)
+sample_probs = ArrayVec((model.output_size,), initial_len, extend_len)
+sample_rewards = []
+
+hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
+output_batch = np.zeros((model.output_size, model.hidden_size + 1))
 
 while True:
     # initialize episode data
@@ -82,13 +86,10 @@ while True:
         # store state and action data
 
         num_states += 1
-        batch_states.push(game_state)
-        batch_hidden_outputs.push(hidden_output)
-        batch_outputs.push(action_probs)
-
-        action_vector = np.zeros(action_probs.size)
-        action_vector[action] = 1
-        batch_actions.push(action_vector)
+        sample_states.push(game_state)
+        sample_hidden_outputs.push(hidden_output)
+        action_probs[action] -= 1
+        sample_probs.push(action_probs)
 
         # advance game state
 
@@ -100,36 +101,40 @@ while True:
 
     for s in range(num_states):
         reward = final_reward * (model.discount_rate ** (num_states - s - 1))
-        batch_rewards.append(reward)
+        sample_rewards.append(reward)
+
+    if episode_num % sample_size == 0:
+        # normalize sample rewards
+
+        sample_rewards = np.array(sample_rewards)
+        sample_rewards -= np.mean(sample_rewards)
+        sample_rewards /= np.std(sample_rewards)
+
+        # calculate sample policy gradients
+
+        for s in range(0, sample_states.len(), sample_split):
+            hidden_grads, output_grads = model.batch_back_prop(
+                sample_states.get_view(s, s + sample_split),
+                sample_hidden_outputs.get_view(s, s + sample_split),
+                sample_probs.get_view(s, s + sample_split),
+                sample_rewards[s:s + sample_split],
+            )
+            hidden_batch += np.sum(hidden_grads, axis=0)
+            output_batch += np.sum(output_grads, axis=0)
+
+        # reset sample data
+
+        sample_states.clear()
+        sample_hidden_outputs.clear()
+        sample_probs.clear()
+        sample_rewards = []
 
     if episode_num % batch_size == 0:
-        # normalize batch rewards
+        # apply policy gradients
 
-        batch_rewards = np.array(batch_rewards)
-        batch_rewards -= np.mean(batch_rewards)
-        batch_rewards /= np.std(batch_rewards)
-
-        # calculate and apply policy gradients
-
-        hidden_grads, output_grads = model.batch_back_prop(
-            batch_states.get_ref(),
-            batch_hidden_outputs.get_ref(),
-            batch_outputs.get_ref(),
-            batch_actions.get_ref(),
-            batch_rewards,
-        )
-        model.apply_gradients(
-            np.sum(hidden_grads, axis=0),
-            np.sum(output_grads, axis=0),
-        )
-
-        # reset batch data
-
-        batch_states.clear()
-        batch_hidden_outputs.clear()
-        batch_outputs.clear()
-        batch_actions.clear()
-        batch_rewards = []
+        model.apply_gradients(hidden_batch, output_batch)
+        hidden_batch.fill(0)
+        output_batch.fill(0)
 
     # update stats counter
     

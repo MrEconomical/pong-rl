@@ -78,10 +78,10 @@ class Model:
 
     # calculate gradients with back propagation
 
-    def back_prop(self, input_data, hidden_output, output, action, reward):
+    def back_prop(self, input_data, hidden_output, output_probs, reward):
         # calculate gradients for output neuron using softmax derivative
 
-        output_deltas = (output - action) * reward # using softmax derivative and policy gradient
+        output_deltas = output_probs * reward # using softmax derivative and policy gradient
         output_gradients = np.empty((self.output_size, self.hidden_size + 1))
         output_gradients[:, :-1] = np.outer(output_deltas, hidden_output) # set output weight derivatives
         output_gradients[:, -1:] = np.reshape(output_deltas, (self.output_size, 1)) # bias is a fixed input of 1
@@ -97,12 +97,12 @@ class Model:
         # return gradients
 
         return hidden_gradients, output_gradients
-    
-    def batch_back_prop(self, input_batch, hidden_outputs, outputs, actions, rewards):
+
+    def batch_back_prop(self, input_batch, hidden_outputs, output_probs, rewards):
         # calculate gradients for output neuron using softmax derivative
 
         batch_len = len(input_batch)
-        output_deltas = (outputs - actions) * rewards.reshape(-1, 1) # using softmax derivative and policy gradient
+        output_deltas = output_probs * rewards.reshape(-1, 1) # using softmax derivative and policy gradient
         output_gradients = np.empty((batch_len, self.output_size, self.hidden_size + 1))
         output_gradients[:, :, :-1] = np.matmul(
             np.reshape(output_deltas, (batch_len, self.output_size, 1)), # stack output deltas for weight derivatives
@@ -124,13 +124,13 @@ class Model:
         # return gradients
 
         return hidden_gradients, output_gradients
-    
+
     # update weights with gradients
 
     def apply_gradients(self, hidden_gradients, output_gradients):
         self.weights[0] -= self.learning_rate * hidden_gradients
         self.weights[1] -= self.learning_rate * output_gradients
-    
+
     # save model to file
 
     def save(self, file_path):

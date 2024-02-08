@@ -16,8 +16,8 @@ import pong_rl
 save_folder = "reinforce_models_1"
 load_model = False
 checkpoint = 0
-log_interval = 12000
-save_interval = 12000
+log_interval = 8000
+save_interval = 8000
 print("save folder: " + save_folder)
 
 model = None
@@ -54,7 +54,7 @@ losses = 0
 
 # initialize training data
 
-batch_size = 1200
+batch_size = 800
 initial_len = 100000
 extend_len = 20000
 
@@ -114,17 +114,18 @@ while True:
         hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
         output_batch = np.zeros((model.output_size, model.hidden_size + 1))
 
-        hidden_grads, output_grads = model.batch_back_prop(
-            batch_states.get_ref(),
-            batch_hidden_outputs.get_ref(),
-            batch_outputs.get_ref(),
-            batch_actions.get_ref(),
-            batch_rewards,
-        )
-        model.apply_gradients(
-            np.sum(hidden_grads, axis=0),
-            np.sum(output_grads, axis=0)
-        )
+        for s in range(batch_states.index):
+            hidden_grad, output_grad = model.back_prop(
+                batch_states.get_ref()[s],
+                batch_hidden_outputs.get_ref()[s],
+                batch_outputs.get_ref()[s],
+                batch_actions.get_ref()[s],
+                batch_rewards[s],
+            )
+            hidden_batch += hidden_grad
+            output_batch += output_grad
+        
+        model.apply_gradients(hidden_batch, output_batch)
 
         # reset batch data
 

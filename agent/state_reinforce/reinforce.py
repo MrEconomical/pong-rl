@@ -16,8 +16,8 @@ import pong_rl
 save_folder = "reinforce_models"
 load_model = False
 checkpoint = 0
-log_interval = 8000
-save_interval = 8000
+log_interval = 6000
+save_interval = 12000
 print("save folder: " + save_folder)
 
 model = None
@@ -54,10 +54,10 @@ losses = 0
 
 # initialize training data
 
-batch_size = 400
-sample_size = 400
-sample_split = 30000
-initial_len = 100000
+batch_size = 800
+sample_size = 800
+sample_split = 40000
+initial_len = 200000
 extend_len = 20000
 
 sample_states = ArrayVec((model.input_size,), initial_len, extend_len)

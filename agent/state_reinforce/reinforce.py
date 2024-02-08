@@ -15,7 +15,7 @@ import pong_rl
 save_folder = "reinforce_models_1"
 load_model = False
 checkpoint = 0
-log_interval = 4000
+log_interval = 6000
 save_interval = 12000
 print("save folder: " + save_folder)
 
@@ -34,7 +34,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.001, # learning rate
+        0.002, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(

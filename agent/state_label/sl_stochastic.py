@@ -1,5 +1,6 @@
 '''
-supervised stochastic learning with full state of Pong environment
+supervised stochastic learning with a batch size of 1 with the full
+state of the Pong environment
 '''
 
 from pathlib import Path

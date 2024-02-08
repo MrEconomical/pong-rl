@@ -1,5 +1,6 @@
 '''
-supervised stochastic learning with direct Pong frame data
+supervised stochastic learning with a batch size of 1 with direct
+Pong frame data
 '''
 
 from pathlib import Path

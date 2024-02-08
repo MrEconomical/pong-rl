@@ -1,5 +1,5 @@
 '''
-supervised batch learning with stacked Pong frame data
+supervised stochastic batch learning with stacked Pong frame data
 '''
 
 from pathlib import Path

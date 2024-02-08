@@ -12,7 +12,7 @@ import pong_rl
 
 # create or load model
 
-save_folder = "reinforce_models_1"
+save_folder = "reinforce_models"
 load_model = False
 checkpoint = 0
 log_interval = 8000

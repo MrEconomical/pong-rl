@@ -12,11 +12,11 @@ import pong_rl
 
 # create or load model
 
-save_folder = "reinforce_models_2"
+save_folder = "reinforce_models_1"
 load_model = False
 checkpoint = 0
-log_interval = 8000
-save_interval = 8000
+log_interval = 4000
+save_interval = 12000
 print("save folder: " + save_folder)
 
 model = None
@@ -34,7 +34,7 @@ else:
         6, # input size
         600, # hidden size
         2, # output size
-        0.0002, # learning rate
+        0.001, # learning rate
         0.99, # discount rate
     )
     print("created new model with parameters ({}, {}, {}, {})".format(
@@ -115,8 +115,8 @@ while True:
             batch_rewards,
         )
         model.apply_gradients(
-            np.sum(hidden_grads, axis=0),
-            np.sum(output_grads, axis=0)
+            np.sum(hidden_grads, axis=0) / batch_size,
+            np.sum(output_grads, axis=0) / batch_size,
         )
 
         # reset batch data

@@ -6,7 +6,6 @@ from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(Path(__file__).parent.absolute()).parent.absolute()))
 
-from array_vec import ArrayVec
 from models.policy_model import Model
 import numpy as np
 import pong_rl
@@ -55,13 +54,10 @@ losses = 0
 # initialize training data
 
 batch_size = 800
-initial_len = 100000
-extend_len = 20000
-
-batch_states = ArrayVec((model.input_size,), initial_len, extend_len)
-batch_hidden_outputs = ArrayVec((model.hidden_size,), initial_len, extend_len)
-batch_outputs = ArrayVec((model.output_size,), initial_len, extend_len)
-batch_actions = ArrayVec((model.output_size,), initial_len, extend_len)
+batch_states = []
+batch_hidden_outputs = []
+batch_outputs = []
+batch_actions = []
 batch_rewards = []
 
 while True:
@@ -82,13 +78,13 @@ while True:
         # store state and action data
 
         num_states += 1
-        batch_states.push(game_state)
-        batch_hidden_outputs.push(hidden_output)
-        batch_outputs.push(action_probs)
+        batch_states.append(game_state)
+        batch_hidden_outputs.append(hidden_output)
+        batch_outputs.append(action_probs)
 
         action_vector = np.zeros(action_probs.size)
         action_vector[action] = 1
-        batch_actions.push(action_vector)
+        batch_actions.append(action_vector)
 
         # advance game state
 
@@ -111,21 +107,17 @@ while True:
 
         # calculate and apply policy gradients
 
-        hidden_batch = np.zeros((model.hidden_size, model.input_size + 1))
-        output_batch = np.zeros((model.output_size, model.hidden_size + 1))
-
-        for s in range(batch_states.len()):
-            hidden_grad, output_grad = model.back_prop(
-                batch_states.get_item(s),
-                batch_hidden_outputs.get_item(s),
-                batch_outputs.get_item(s),
-                batch_actions.get_item(s),
-                batch_rewards[s],
-            )
-            hidden_batch += hidden_grad
-            output_batch += output_grad
-        
-        model.apply_gradients(hidden_batch, output_batch)
+        hidden_grads, output_grads = model.batch_back_prop(
+            np.array(batch_states),
+            np.array(batch_hidden_outputs),
+            np.array(batch_outputs),
+            np.array(batch_actions),
+            batch_rewards,
+        )
+        model.apply_gradients(
+            np.sum(hidden_grads, axis=0),
+            np.sum(output_grads, axis=0)
+        )
 
         # reset batch data
 

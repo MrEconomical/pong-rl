@@ -4,16 +4,17 @@ implementation of an expandable vector backed by a NumPy array
 
 import numpy as np
 
+# TODO: investigate precision loss
 class ArrayVec:
     shape = None
     extend_len = None
     array = None
     index = None
 
-    def __init__(self, shape, initial_size, extend_len):
+    def __init__(self, shape, initial_len, extend_len):
         self.shape = shape
         self.extend_len = extend_len
-        self.array = np.empty((initial_size,) + self.shape)
+        self.array = np.empty((initial_len,) + self.shape)
         self.index = 0
     
     def push(self, array):

@@ -14,7 +14,7 @@ import pong_rl
 Model = PolicyModel
 model_type = "state_policy"
 folder_path = "agent/state_reinforce/reinforce_models"
-checkpoint = 60
+checkpoint = 50
 num_trials = 20
 trial_len = 500
 
